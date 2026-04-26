@@ -931,12 +931,12 @@ const SectionTitle = ({
   title: string;
   subtitle?: string;
 }) => (
-  <div className="flex items-end justify-between mb-3 px-1">
-    <div className="flex items-baseline gap-3">
-      <span className="font-mono text-xs text-muted-foreground tabular-nums">{index}</span>
-      <h2 className="font-display text-xl tracking-tight">{title}</h2>
-    </div>
-    {subtitle && <span className="text-xs text-muted-foreground hidden md:block">{subtitle}</span>}
+  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 min-w-0">
+    <span className="font-mono text-xs text-muted-foreground tabular-nums">{index}</span>
+    <h2 className="font-display text-xl sm:text-2xl tracking-tight leading-none">{title}</h2>
+    {subtitle && (
+      <span className="text-xs text-muted-foreground hidden md:block">{subtitle}</span>
+    )}
   </div>
 );
 
