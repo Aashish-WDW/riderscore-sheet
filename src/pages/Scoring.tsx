@@ -590,43 +590,45 @@ const Index = () => {
           <div className="bg-card border border-border rounded-xl overflow-hidden shadow-soft">
             <div className="overflow-x-auto">
               <table className="w-full text-sm min-w-[640px]">
-                <tr>
-                  <td className="px-3 py-4 w-12 text-center">
-                    <span className="inline-grid place-items-center h-7 w-7 rounded-full border border-border font-display text-xs">1</span>
-                  </td>
-                  <td className="px-3 py-4">
-                    Rider's position and seat; correctness and effect of the aids
-                  </td>
-                  <td className="px-1 py-2 w-24">
-                    <NumInput value={collective} onChange={setCollective} placeholder="Mark" accent />
-                  </td>
-                  <td className="px-1 py-2 w-24">
-                    <NumInput value={collectiveCorrection} onChange={setCollectiveCorrection} placeholder="Corr." />
-                  </td>
-                  <td className="px-3 py-4 w-16 text-center text-muted-foreground text-xs">×{COLLECTIVE_COEF}</td>
-                  <td className="px-3 py-4 w-24 text-center font-display text-lg text-highlight tabular-nums">
-                    {collectiveFinal ? collectiveFinal.toFixed(1) : "—"}
-                  </td>
-                  <td className="px-1 py-2 w-44">
-                    <input
-                      className="w-full bg-transparent rounded-md px-2 py-1.5 text-xs outline-none focus:bg-background focus:ring-1 focus:ring-ring transition-all"
-                      placeholder="Remarks"
-                      value={collectiveRemarks}
-                      onChange={(e) => setCollectiveRemarks(e.target.value)}
-                    />
-                  </td>
-                </tr>
-                <tr className="border-t-2 border-foreground/20 bg-muted/40">
-                  <td colSpan={2} className="px-3 py-3 font-display text-sm uppercase tracking-wider">Total</td>
-                  <td colSpan={2} className="px-3 py-3 text-center text-xs text-muted-foreground tabular-nums">/ {GRAND_TOTAL_MAX}</td>
-                  <td></td>
-                  <td className="px-3 py-3 text-center font-display text-lg text-highlight tabular-nums">
-                    {grandTotal.toFixed(1)}
-                  </td>
-                  <td></td>
-                </tr>
-              </tbody>
-            </table>
+                <tbody>
+                  <tr>
+                    <td className="px-3 py-4 w-12 text-center">
+                      <span className="inline-grid place-items-center h-7 w-7 rounded-full border border-border font-display text-xs">1</span>
+                    </td>
+                    <td className="px-3 py-4">
+                      Rider's position and seat; correctness and effect of the aids
+                    </td>
+                    <td className="px-1 py-2 w-24">
+                      <NumInput value={collective} onChange={setCollective} placeholder="Mark" accent />
+                    </td>
+                    <td className="px-1 py-2 w-24">
+                      <NumInput value={collectiveCorrection} onChange={setCollectiveCorrection} placeholder="Corr." />
+                    </td>
+                    <td className="px-3 py-4 w-16 text-center text-muted-foreground text-xs">×{COLLECTIVE_COEF}</td>
+                    <td className="px-3 py-4 w-24 text-center font-display text-lg text-highlight tabular-nums">
+                      {collectiveFinal ? collectiveFinal.toFixed(1) : "—"}
+                    </td>
+                    <td className="px-1 py-2 w-44">
+                      <input
+                        className="w-full bg-transparent rounded-md px-2 py-1.5 text-xs outline-none focus:bg-background focus:ring-1 focus:ring-ring transition-all"
+                        placeholder="Remarks"
+                        value={collectiveRemarks}
+                        onChange={(e) => setCollectiveRemarks(e.target.value)}
+                      />
+                    </td>
+                  </tr>
+                  <tr className="border-t-2 border-foreground/20 bg-muted/40">
+                    <td colSpan={2} className="px-3 py-3 font-display text-sm uppercase tracking-wider">Total</td>
+                    <td colSpan={2} className="px-3 py-3 text-center text-xs text-muted-foreground tabular-nums">/ {GRAND_TOTAL_MAX}</td>
+                    <td></td>
+                    <td className="px-3 py-3 text-center font-display text-lg text-highlight tabular-nums">
+                      {grandTotal.toFixed(1)}
+                    </td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
