@@ -48,9 +48,77 @@ const YOUNG_RIDER_MOVEMENTS: Movement[] = [
   { no: "27", letters: "A\nX", test: "Down the centre line\nHalt – immobility – salute", coefficient: 1, directive: "The straightness, the transitions and the halt." },
 ];
 
+const CHILDREN_I_MOVEMENTS: Movement[] = [
+  { no: "1", letters: "A\nX", test: "Enter in working trot\nHalt – immobility – salute\nProceed in working trot", coefficient: 1, directive: "The entry, the straightness, the activity, the halt, the transitions." },
+  { no: "2", letters: "C\nM X K\nK", test: "Track to the right\nMedium trot\nWorking trot", coefficient: 1, directive: "The bend at C, the regularity and the lengthening of the steps and frame." },
+  { no: "3", letters: "M / K", test: "Transitions at M and K", coefficient: 1, directive: "The clear definition and fluency of the transitions." },
+  { no: "4", letters: "A\nD\nL", test: "Down centre line\nLeg yielding to the right, return to the track between R and M", coefficient: 1, directive: "The flow and balance, the straightness, the parallelism to the track, the activity." },
+  { no: "5", letters: "C", test: "Circle to the left 20 m diameter, while crossing the centre line give and retake the reins for a few steps", coefficient: 2, directive: "The rhythm and the maintenance of the same attitude and balance while giving hands; reins should be clearly loose." },
+  { no: "6", letters: "H X F\nF A", test: "Medium trot\nWorking trot", coefficient: 1, directive: "The regularity and the lengthening of the steps and frame." },
+  { no: "7", letters: "H / F", test: "Transitions at H and F", coefficient: 1, directive: "The clear definition and fluency of the transition." },
+  { no: "8", letters: "A", test: "Down centre line\nLeg yielding to the left, return to the track between S and H", coefficient: 1, directive: "The flow and balance, the straightness, the parallelism to the track, the activity." },
+  { no: "9", letters: "C", test: "Rising trot and circle to the right 20 m diameter\nOn the open side of the circle (crossing the centre line) slowly lengthen the reins, then slowly shorten on a long rein, forwards/downwards\nOn the closed side of the circle take up the reins", coefficient: 2, directive: "The stretching of the neck and nose forwards and downwards, the steadiness of the contact, the regularity and balance of the trot." },
+  { no: "10", letters: "C", test: "Medium walk", coefficient: 1, directive: "The regularity, relaxation and the groundcover." },
+  { no: "11", letters: "M V", test: "Medium walk, lengthen the reins and allow the horse to stretch on a long rein", coefficient: 2, directive: "The rhythm and activity of the steps, the lengthening of the frame. The fluency of the shortening of the reins and maintenance of the activity and the quality of the walk. The transitions." },
+  { no: "12", letters: "V K\nF\nK", test: "Medium walk and recollect the reins\nProceed in working canter left\nWorking canter", coefficient: 1, directive: "The straightness and the balance." },
+  { no: "13", letters: "F M\nM H", test: "Medium canter\nWorking canter", coefficient: 1, directive: "The lengthening of the frame and groundcover of the strides." },
+  { no: "14", letters: "F / M", test: "The transitions at F and M", coefficient: 1, directive: "The clear definition and fluency of the transitions." },
+  { no: "15", letters: "H B\nP V\nV S", test: "Change rein\nHalf circle in counter canter\nCounter canter", coefficient: 2, directive: "Quality of the canter, self carriage, balance and keeping the quarters in line with the forelegs." },
+  { no: "16", letters: "S", test: "Medium walk", coefficient: 1, directive: "The straightness, the balance, the transitions, and the quality of the walk." },
+  { no: "17", letters: "H", test: "Working canter", coefficient: 1, directive: "The transition, straightness, quality of the canter." },
+  { no: "18", letters: "M F\nF K", test: "Medium canter\nWorking canter", coefficient: 1, directive: "The lengthening of the frame and strides." },
+  { no: "19", letters: "M / F", test: "Transitions at M and F", coefficient: 1, directive: "The clear definition and the fluency of the transition." },
+  { no: "20", letters: "K B\nR S\nS V", test: "Change rein in working canter\nHalf-circle in counter canter\nCounter canter", coefficient: 2, directive: "Quality of the canter, self carriage, balance and keeping the quarters in line with the forelegs." },
+  { no: "21", letters: "V", test: "Working trot", coefficient: 1, directive: "The transition and the trot between V and A." },
+  { no: "22", letters: "A", test: "Down centre line\nHalt – immobility – salute", coefficient: 1, directive: "The quality of the trot, straightness, the transitions, the halt." },
+];
+
+const TEST_CONFIGS: Record<string, TestConfig> = {
+  "young-rider": {
+    label: "Young Rider",
+    appendix: "Appendix A",
+    abbr: "YR",
+    subtitle: "Time 6′30″ · Minimum age of horse: 6 years",
+    movements: YOUNG_RIDER_MOVEMENTS,
+  },
+  "junior": {
+    label: "Junior",
+    appendix: "Appendix C",
+    abbr: "JR",
+    subtitle: "Junior dressage test",
+    movements: YOUNG_RIDER_MOVEMENTS, // placeholder until Junior test is provided
+  },
+  "children-i": {
+    label: "Children I",
+    appendix: "Appendix D",
+    abbr: "C1",
+    subtitle: "Time 5 min · Min age of horse: 8 years (children) / 5 years (adults). All trot work sitting unless indicated.",
+    movements: CHILDREN_I_MOVEMENTS,
+  },
+  "children-ii": {
+    label: "Children II",
+    appendix: "Appendix E",
+    abbr: "C2",
+    subtitle: "Children II dressage test",
+    movements: YOUNG_RIDER_MOVEMENTS, // placeholder until Children II test is provided
+  },
+};
+
+const COLLECTIVE_COEF = 2;
+const COURSE_ERRORS = [
+  { label: "No error", value: 0 },
+  { label: "1st error · −0.5%", value: 0.5 },
+  { label: "2nd error · −1%", value: 1 },
+  { label: "3rd error · Elimination", value: -1 },
+];
+
 const Index = () => {
   const { testId = "young-rider" } = useParams<{ testId: string }>();
-  const info = TEST_INFO[testId] ?? TEST_INFO["young-rider"];
+  const config = TEST_CONFIGS[testId] ?? TEST_CONFIGS["young-rider"];
+  const info = config;
+  const MOVEMENTS = config.movements;
+  const TOTAL_MAX = MOVEMENTS.reduce((sum, m) => sum + 10 * m.coefficient, 0);
+  const GRAND_TOTAL_MAX = TOTAL_MAX + 10 * COLLECTIVE_COEF;
   const STORAGE_KEY = `scoring-draft-v1:${testId}`;
   const [meta, setMeta] = useState({
     event: "",
