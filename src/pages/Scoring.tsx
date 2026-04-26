@@ -581,10 +581,10 @@ const Index = () => {
                     <td colSpan={3} className="px-3 py-3 font-display text-sm uppercase tracking-wider">
                       Subtotal
                     </td>
-                    <td className="px-3 py-3 text-center text-xs text-muted-foreground tabular-nums">/ {TOTAL_MAX}</td>
-                    <td colSpan={2}></td>
-                    <td className="px-3 py-3 text-center font-display text-lg tabular-nums text-highlight">
+                    <td colSpan={3}></td>
+                    <td className="px-3 py-3 text-center font-display text-lg tabular-nums text-highlight whitespace-nowrap">
                       {movementsTotal.toFixed(1)}
+                      <span className="text-xs text-muted-foreground ml-1">/ {TOTAL_MAX}</span>
                     </td>
                     <td colSpan={2}></td>
                   </tr>
