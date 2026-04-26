@@ -1,4 +1,7 @@
-import { useMemo, useState } from "react";
+import * as React from "react";
+import { useMemo, useState, useEffect, useRef, useCallback, KeyboardEvent } from "react";
+
+const STORAGE_KEY = "yr-scoring-draft-v1";
 
 type Movement = {
   no: string;
@@ -137,9 +140,105 @@ const Index = () => {
     setCollectiveRemarks("");
     setCourseError(0);
     setOtherErrors(0);
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    setHasDraft(false);
+    setSavedAt(null);
   };
 
   const progressPct = (filledCount / MOVEMENTS.length) * 100;
+
+  /* ---------- autosave ---------- */
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [hasDraft, setHasDraft] = useState<boolean>(false);
+  const hydrated = useRef(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) setHasDraft(true);
+    } catch {}
+    hydrated.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    const payload = {
+      meta, scores, corrections, coefficients, remarks,
+      collective, collectiveCorrection, collectiveRemarks,
+      courseError, otherErrors, organisers,
+      ts: Date.now(),
+    };
+    const t = setTimeout(() => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        setSavedAt(Date.now());
+        setHasDraft(true);
+      } catch {}
+    }, 400);
+    return () => clearTimeout(t);
+  }, [meta, scores, corrections, coefficients, remarks, collective, collectiveCorrection, collectiveRemarks, courseError, otherErrors, organisers]);
+
+  const loadDraft = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      setMeta(d.meta ?? meta);
+      setScores(d.scores ?? {});
+      setCorrections(d.corrections ?? {});
+      setCoefficients(d.coefficients ?? {});
+      setRemarks(d.remarks ?? {});
+      setCollective(d.collective ?? "");
+      setCollectiveCorrection(d.collectiveCorrection ?? "");
+      setCollectiveRemarks(d.collectiveRemarks ?? "");
+      setCourseError(d.courseError ?? 0);
+      setOtherErrors(d.otherErrors ?? 0);
+      setOrganisers(d.organisers ?? "");
+    } catch {}
+  };
+
+  /* ---------- keyboard nav for score inputs ---------- */
+  const handleGridKey = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+    const target = e.currentTarget;
+    const row = parseInt(target.dataset.row || "0", 10);
+    const col = parseInt(target.dataset.col || "0", 10); // 0 = mark, 1 = correction
+    const move = (r: number, c: number) => {
+      const sel = document.querySelector<HTMLInputElement>(`input[data-grid="1"][data-row="${r}"][data-col="${c}"]`);
+      if (sel) { e.preventDefault(); sel.focus(); sel.select(); }
+    };
+    if (e.key === "ArrowDown" || e.key === "Enter") move(row + 1, col);
+    else if (e.key === "ArrowUp") move(row - 1, col);
+    else if (e.key === "ArrowRight" && (target.selectionStart ?? 0) >= target.value.length) move(row, col + 1);
+    else if (e.key === "ArrowLeft" && (target.selectionStart ?? 0) === 0) move(row, col - 1);
+    else if ((e.key === "n" || e.key === "N") && (e.metaKey || e.ctrlKey)) {
+      // Cmd/Ctrl+N → next empty mark
+      const next = MOVEMENTS.findIndex((m, i) => i > row && !(scores[m.no] || corrections[m.no]));
+      if (next >= 0) move(next, 0);
+    }
+  }, [scores, corrections]);
+
+  const jumpToNextEmpty = () => {
+    const idx = MOVEMENTS.findIndex((m) => !(scores[m.no] || corrections[m.no]));
+    if (idx >= 0) {
+      const sel = document.querySelector<HTMLInputElement>(`input[data-grid="1"][data-row="${idx}"][data-col="0"]`);
+      sel?.focus(); sel?.select();
+    }
+  };
+
+  /* ---------- export / print ---------- */
+  const exportPdf = () => {
+    const safe = (s: string) => s.replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "") || "untitled";
+    const fname = `young-rider_${safe(meta.event || "event")}_${safe(meta.date || "date")}`;
+    const prev = document.title;
+    document.title = fname;
+    window.print();
+    setTimeout(() => { document.title = prev; }, 1000);
+  };
+
+  const savedLabel = savedAt
+    ? `Saved · ${new Date(savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+    : "Not saved yet";
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -156,8 +255,12 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-4">
-            <div className="text-right">
+          <div className="hidden md:flex items-center gap-3">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground" title={savedLabel}>
+              <span className={`h-1.5 w-1.5 rounded-full ${savedAt ? "bg-highlight" : "bg-muted-foreground/40"}`} />
+              <span className="tabular-nums">{savedLabel}</span>
+            </div>
+            <div className="text-right ml-2">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Current</div>
               <div className="font-display text-2xl tabular-nums">
                 {eliminated ? (
@@ -170,6 +273,15 @@ const Index = () => {
                 )}
               </div>
             </div>
+            {hasDraft && (
+              <button
+                onClick={loadDraft}
+                className="text-sm px-3 py-1.5 rounded-md border border-border hover:bg-muted transition-colors"
+                title="Load last saved draft"
+              >
+                Load draft
+              </button>
+            )}
             <button
               onClick={reset}
               className="text-sm px-3 py-1.5 rounded-md border border-border hover:bg-muted transition-colors"
@@ -177,10 +289,10 @@ const Index = () => {
               Reset
             </button>
             <button
-              onClick={() => window.print()}
+              onClick={exportPdf}
               className="text-sm px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              Print / PDF
+              Export PDF
             </button>
           </div>
         </div>
@@ -229,21 +341,29 @@ const Index = () => {
 
         {/* Movements */}
         <section className="mb-8 print:mb-4">
-          <SectionTitle index="01" title="Movements" subtitle="Score each movement from 0 to 10" />
+          <div className="flex items-end justify-between mb-3 px-1">
+            <SectionTitle index="01" title="Movements" subtitle="Score 0–10 · ↑↓ move rows · → jump field · Enter next" />
+            <button
+              onClick={jumpToNextEmpty}
+              className="text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted transition-colors print:hidden"
+            >
+              Jump to next empty ↵
+            </button>
+          </div>
 
           <div className="bg-card border border-border rounded-xl overflow-hidden shadow-soft">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-muted/60 text-[11px] uppercase tracking-wider text-muted-foreground">
+            <div className="overflow-x-auto max-h-[70vh] print:max-h-none print:overflow-visible">
+              <table className="w-full text-sm table-fixed">
+                <thead className="sticky top-0 z-10">
+                  <tr className="bg-muted text-[11px] uppercase tracking-wider text-muted-foreground shadow-soft">
                     <Th className="w-12 text-center">No.</Th>
                     <Th className="w-20 text-center">Letters</Th>
-                    <Th>Test</Th>
+                    <Th className="w-auto">Test</Th>
                     <Th className="w-20 text-center">Mark</Th>
                     <Th className="w-20 text-center">Correction</Th>
                     <Th className="w-16 text-center">Coeff.</Th>
                     <Th className="w-20 text-center">Final</Th>
-                    <Th className="w-[280px]">Directive Ideas</Th>
+                    <Th className="w-[26%]">Directive Ideas</Th>
                     <Th className="w-44">Remarks</Th>
                   </tr>
                 </thead>
@@ -256,7 +376,7 @@ const Index = () => {
                         key={m.no}
                         className={`border-t border-border transition-colors ${
                           i % 2 === 0 ? "bg-background" : "bg-muted/20"
-                        } hover:bg-accent/30`}
+                        } hover:bg-accent/40 focus-within:bg-accent/60`}
                       >
                         <td className="px-3 py-3 text-center">
                           <span className="inline-grid place-items-center h-7 w-7 rounded-full border border-border font-display text-xs tabular-nums">
@@ -273,6 +393,10 @@ const Index = () => {
                             onChange={(v) => handleScore(m.no, v)}
                             placeholder="—"
                             accent
+                            data-grid="1"
+                            data-row={i}
+                            data-col={0}
+                            onKeyDown={handleGridKey}
                           />
                         </td>
                         <td className="px-1 py-2">
@@ -280,6 +404,10 @@ const Index = () => {
                             value={corrections[m.no] || ""}
                             onChange={(v) => handleCorrection(m.no, v)}
                             placeholder="—"
+                            data-grid="1"
+                            data-row={i}
+                            data-col={1}
+                            onKeyDown={handleGridKey}
                           />
                         </td>
                         <td className="px-1 py-2">
@@ -559,6 +687,15 @@ const Th = ({ children, className = "" }: { children: React.ReactNode; className
   <th className={`px-3 py-3 text-left font-medium ${className}`}>{children}</th>
 );
 
+type NumInputProps = {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  accent?: boolean;
+  min?: number;
+  step?: number;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "min" | "step" | "placeholder">;
+
 const NumInput = ({
   value,
   onChange,
@@ -566,14 +703,9 @@ const NumInput = ({
   accent = false,
   min = 0,
   step = 0.5,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  accent?: boolean;
-  min?: number;
-  step?: number;
-}) => (
+  className,
+  ...rest
+}: NumInputProps) => (
   <input
     type="number"
     inputMode="decimal"
@@ -587,7 +719,8 @@ const NumInput = ({
       accent
         ? "border-border focus:border-highlight focus:bg-background focus:ring-2 focus:ring-highlight/20"
         : "border-transparent hover:border-border focus:border-ring focus:bg-background"
-    }`}
+    } ${className ?? ""}`}
+    {...rest}
   />
 );
 
