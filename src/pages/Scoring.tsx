@@ -698,11 +698,11 @@ const Index = () => {
 
             {/* Score card */}
             <div className="lg:col-span-2">
-              <div className="relative overflow-hidden bg-primary text-primary-foreground rounded-xl p-6 shadow-card h-full flex flex-col justify-between">
+              <div className="relative overflow-hidden bg-primary text-primary-foreground rounded-xl p-5 sm:p-6 shadow-card h-full flex flex-col justify-between">
                 <div className="absolute -top-12 -right-12 h-40 w-40 rounded-full bg-highlight/20 blur-2xl" />
                 <div className="relative">
                   <div className="text-[10px] uppercase tracking-[0.25em] opacity-70">Total Score</div>
-                  <div className="font-display text-6xl mt-3 tabular-nums leading-none">
+                  <div className="font-display text-5xl sm:text-6xl mt-3 tabular-nums leading-none break-all">
                     {eliminated ? (
                       <span className="text-destructive-foreground">—</span>
                     ) : (
