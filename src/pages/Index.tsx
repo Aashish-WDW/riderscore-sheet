@@ -143,6 +143,99 @@ const Index = () => {
 
   const progressPct = (filledCount / MOVEMENTS.length) * 100;
 
+  /* ---------- autosave ---------- */
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [hasDraft, setHasDraft] = useState<boolean>(false);
+  const hydrated = useRef(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) setHasDraft(true);
+    } catch {}
+    hydrated.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    const payload = {
+      meta, scores, corrections, coefficients, remarks,
+      collective, collectiveCorrection, collectiveRemarks,
+      courseError, otherErrors, organisers,
+      ts: Date.now(),
+    };
+    const t = setTimeout(() => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        setSavedAt(Date.now());
+        setHasDraft(true);
+      } catch {}
+    }, 400);
+    return () => clearTimeout(t);
+  }, [meta, scores, corrections, coefficients, remarks, collective, collectiveCorrection, collectiveRemarks, courseError, otherErrors, organisers]);
+
+  const loadDraft = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      setMeta(d.meta ?? meta);
+      setScores(d.scores ?? {});
+      setCorrections(d.corrections ?? {});
+      setCoefficients(d.coefficients ?? {});
+      setRemarks(d.remarks ?? {});
+      setCollective(d.collective ?? "");
+      setCollectiveCorrection(d.collectiveCorrection ?? "");
+      setCollectiveRemarks(d.collectiveRemarks ?? "");
+      setCourseError(d.courseError ?? 0);
+      setOtherErrors(d.otherErrors ?? 0);
+      setOrganisers(d.organisers ?? "");
+    } catch {}
+  };
+
+  /* ---------- keyboard nav for score inputs ---------- */
+  const handleGridKey = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+    const target = e.currentTarget;
+    const row = parseInt(target.dataset.row || "0", 10);
+    const col = parseInt(target.dataset.col || "0", 10); // 0 = mark, 1 = correction
+    const move = (r: number, c: number) => {
+      const sel = document.querySelector<HTMLInputElement>(`input[data-grid="1"][data-row="${r}"][data-col="${c}"]`);
+      if (sel) { e.preventDefault(); sel.focus(); sel.select(); }
+    };
+    if (e.key === "ArrowDown" || e.key === "Enter") move(row + 1, col);
+    else if (e.key === "ArrowUp") move(row - 1, col);
+    else if (e.key === "ArrowRight" && (target.selectionStart ?? 0) >= target.value.length) move(row, col + 1);
+    else if (e.key === "ArrowLeft" && (target.selectionStart ?? 0) === 0) move(row, col - 1);
+    else if ((e.key === "n" || e.key === "N") && (e.metaKey || e.ctrlKey)) {
+      // Cmd/Ctrl+N → next empty mark
+      const next = MOVEMENTS.findIndex((m, i) => i > row && !(scores[m.no] || corrections[m.no]));
+      if (next >= 0) move(next, 0);
+    }
+  }, [scores, corrections]);
+
+  const jumpToNextEmpty = () => {
+    const idx = MOVEMENTS.findIndex((m) => !(scores[m.no] || corrections[m.no]));
+    if (idx >= 0) {
+      const sel = document.querySelector<HTMLInputElement>(`input[data-grid="1"][data-row="${idx}"][data-col="0"]`);
+      sel?.focus(); sel?.select();
+    }
+  };
+
+  /* ---------- export / print ---------- */
+  const exportPdf = () => {
+    const safe = (s: string) => s.replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "") || "untitled";
+    const fname = `young-rider_${safe(meta.event || "event")}_${safe(meta.date || "date")}`;
+    const prev = document.title;
+    document.title = fname;
+    window.print();
+    setTimeout(() => { document.title = prev; }, 1000);
+  };
+
+  const savedLabel = savedAt
+    ? `Saved · ${new Date(savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+    : "Not saved yet";
+
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Top nav */}
