@@ -218,7 +218,7 @@ const Index = () => {
                     onChange={(e) => updateCorrection(m.no, e.target.value)}
                   />
                 </td>
-                <td className="border border-foreground p-1 text-center text-muted-foreground">{m.coefficient > 1 ? m.coefficient : ""}</td>
+                <td className="border border-foreground p-1 text-center"></td>
                 <td className="border border-foreground p-1 text-center font-semibold">
                   {finalMarks[m.no] ? finalMarks[m.no].toFixed(1) : ""}
                 </td>
