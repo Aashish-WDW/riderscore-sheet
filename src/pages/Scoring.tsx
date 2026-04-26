@@ -105,8 +105,7 @@ const CHILDREN_II_MOVEMENTS: Movement[] = [
   { no: "7", letters: "R M C", test: "Working trot", coefficient: 1, directive: "The transitions. The quality of the trot." },
   { no: "8", letters: "C", test: "Proceed in working canter left", coefficient: 1, directive: "The transitions and the balance." },
   { no: "9", letters: "E", test: "Circle to the left 15 m diameter", coefficient: 1, directive: "The bend, the regularity of the circle and the quality of the canter." },
-  { no: "10", letters: "E K A
-F B", test: "Working canter", coefficient: 1, directive: "The quality of the canter." },
+  { no: "10", letters: "E K A\nF B", test: "Working canter", coefficient: 1, directive: "The quality of the canter." },
   { no: "11", letters: "B", test: "Working trot", coefficient: 1, directive: "The transition. The quality of the trot." },
   { no: "12", letters: "C A", test: "Serpentine 4 loops", coefficient: 2, directive: "The bend, the correctness of the loops and the straightness of the lines between the loops." },
   { no: "13", letters: "A", test: "Proceed in working canter right", coefficient: 1, directive: "The transition and the quality of the canter." },
