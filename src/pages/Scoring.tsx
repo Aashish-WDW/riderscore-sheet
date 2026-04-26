@@ -253,29 +253,43 @@ const Index = () => {
     <div className="min-h-screen bg-background text-foreground">
       {/* Top nav */}
       <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-md print:hidden">
-        <div className="mx-auto max-w-[1200px] px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <Link
               to="/"
-              className="text-xs text-muted-foreground hover:text-foreground transition-colors mr-1"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Back to tests"
               title="Back to tests"
             >
               ←
             </Link>
-            <div className="h-8 w-8 rounded-md bg-primary text-primary-foreground grid place-items-center font-display font-semibold">
+            <div className="h-8 w-8 shrink-0 rounded-md bg-primary text-primary-foreground grid place-items-center font-display font-semibold text-sm">
               {info.abbr}
             </div>
-            <div>
-              <div className="font-display text-lg leading-tight">{info.label}</div>
-              <div className="text-xs text-muted-foreground tracking-wide uppercase">{info.appendix} · Scoring</div>
+            <div className="min-w-0">
+              <div className="font-display text-base sm:text-lg leading-tight truncate">{info.label}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground tracking-wide uppercase truncate">
+                {info.appendix} · Scoring
+              </div>
             </div>
+          </div>
+
+          {/* Mobile: compact percentage */}
+          <div className="md:hidden font-display text-lg tabular-nums shrink-0">
+            {eliminated ? (
+              <span className="text-destructive text-sm">Elim.</span>
+            ) : (
+              <>
+                <span className="text-highlight">{percentage.toFixed(1)}</span>
+                <span className="text-muted-foreground text-xs">%</span>
+              </>
+            )}
           </div>
 
           <div className="hidden md:flex items-center gap-3">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground" title={savedLabel}>
               <span className={`h-1.5 w-1.5 rounded-full ${savedAt ? "bg-highlight" : "bg-muted-foreground/40"}`} />
-              <span className="tabular-nums">{savedLabel}</span>
+              <span className="tabular-nums hidden lg:inline">{savedLabel}</span>
             </div>
             <div className="text-right ml-2">
               <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Current</div>
@@ -322,20 +336,20 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="mx-auto max-w-[1200px] px-6 py-8 print:px-4 print:py-2">
+      <main className="mx-auto max-w-[1200px] px-4 sm:px-6 py-6 sm:py-8 print:px-4 print:py-2">
         {/* Hero / Meta card */}
-        <section className="mb-8 print:mb-4">
-          <div className="flex items-end justify-between mb-4">
-            <div>
-              <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">FEI · Dressage Test</div>
-              <h1 className="font-display text-4xl md:text-5xl tracking-tight">
+        <section className="mb-6 sm:mb-8 print:mb-4">
+          <div className="flex items-end justify-between mb-4 gap-4">
+            <div className="min-w-0">
+              <div className="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">FEI · Dressage Test</div>
+              <h1 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight">
                 {info.label} <span className="italic text-highlight">scoring</span>
               </h1>
-              <p className="text-sm text-muted-foreground mt-2">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-2">
                 Time 6′30″ · Minimum age of horse: 6 years
               </p>
             </div>
-            <div className="hidden lg:block text-right">
+            <div className="hidden lg:block text-right shrink-0">
               <div className="text-xs uppercase tracking-wider text-muted-foreground">Movements</div>
               <div className="font-display text-3xl tabular-nums">
                 {filledCount}<span className="text-muted-foreground">/{MOVEMENTS.length}</span>
@@ -343,8 +357,8 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="bg-card border border-border rounded-xl p-6 shadow-soft">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+          <div className="bg-card border border-border rounded-xl p-4 sm:p-6 shadow-soft">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
               <Field label="Event" value={meta.event} onChange={(v) => setMeta({ ...meta, event: v })} />
               <Field label="Date" value={meta.date} onChange={(v) => setMeta({ ...meta, date: v })} />
               <Field label="Judge" value={meta.judge} onChange={(v) => setMeta({ ...meta, judge: v })} />
@@ -357,9 +371,9 @@ const Index = () => {
         </section>
 
         {/* Movements */}
-        <section className="mb-8 print:mb-4">
-          <div className="flex items-end justify-between mb-3 px-1">
-            <SectionTitle index="01" title="Movements" subtitle="Score 0–10 · ↑↓ move rows · → jump field · Enter next" />
+        <section className="mb-6 sm:mb-8 print:mb-4">
+          <div className="flex flex-wrap items-end justify-between mb-3 px-1 gap-2">
+            <SectionTitle index="01" title="Movements" subtitle="Score 0–10 · ↑↓ rows · → field · Enter next" />
             <button
               onClick={jumpToNextEmpty}
               className="text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted transition-colors print:hidden"
@@ -368,7 +382,8 @@ const Index = () => {
             </button>
           </div>
 
-          <div className="bg-card border border-border rounded-xl overflow-hidden shadow-soft">
+          {/* Desktop / large-tablet table */}
+          <div className="hidden lg:block bg-card border border-border rounded-xl overflow-hidden shadow-soft">
             <div className="overflow-x-auto max-h-[70vh] print:max-h-none print:overflow-visible">
               <table className="w-full text-sm table-fixed">
                 <thead className="sticky top-0 z-10">
@@ -476,6 +491,96 @@ const Index = () => {
               </table>
             </div>
           </div>
+
+          {/* Mobile / tablet card list */}
+          <div className="lg:hidden space-y-3">
+            {MOVEMENTS.map((m, i) => {
+              const final = finalMarks[m.no];
+              const hasValue = final > 0;
+              return (
+                <div
+                  key={m.no}
+                  className="bg-card border border-border rounded-xl shadow-soft p-4 focus-within:border-highlight/60 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="inline-grid place-items-center h-8 w-8 shrink-0 rounded-full border border-border font-display text-xs tabular-nums">
+                        {m.no}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground whitespace-pre-line">
+                          {m.letters || "—"}
+                        </div>
+                        <div className="text-sm leading-snug whitespace-pre-line mt-0.5">{m.test}</div>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Final</div>
+                      <div className={`font-display tabular-nums text-lg ${hasValue ? "text-highlight" : "text-muted-foreground/40"}`}>
+                        {hasValue ? final.toFixed(1) : "—"}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 mb-2">
+                    <label className="block">
+                      <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Mark</span>
+                      <NumInput
+                        value={scores[m.no] || ""}
+                        onChange={(v) => handleScore(m.no, v)}
+                        placeholder="—"
+                        accent
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Corr.</span>
+                      <NumInput
+                        value={corrections[m.no] || ""}
+                        onChange={(v) => handleCorrection(m.no, v)}
+                        placeholder="—"
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Coeff.</span>
+                      <NumInput
+                        value={coefficients[m.no] ?? ""}
+                        onChange={(v) => {
+                          if (v !== "" && (parseFloat(v) < 1 || parseFloat(v) > 10)) return;
+                          setCoefficients((c) => ({ ...c, [m.no]: v }));
+                        }}
+                        placeholder={String(m.coefficient)}
+                        min={1}
+                        step={1}
+                      />
+                    </label>
+                  </div>
+
+                  <details className="group">
+                    <summary className="cursor-pointer text-[11px] uppercase tracking-wider text-muted-foreground list-none flex items-center gap-1 select-none">
+                      <span className="group-open:rotate-90 transition-transform">›</span>
+                      Directive & remarks
+                    </summary>
+                    <div className="mt-2 space-y-2">
+                      <p className="text-xs text-muted-foreground leading-snug">{m.directive}</p>
+                      <input
+                        className="w-full bg-background border border-border rounded-md px-2 py-1.5 text-xs outline-none focus:ring-1 focus:ring-ring transition-all"
+                        placeholder="Remarks"
+                        value={remarks[m.no] || ""}
+                        onChange={(e) => setRemarks((r) => ({ ...r, [m.no]: e.target.value }))}
+                      />
+                    </div>
+                  </details>
+                </div>
+              );
+            })}
+            <div className="bg-muted/40 border border-border rounded-xl px-4 py-3 flex items-center justify-between">
+              <span className="font-display text-sm uppercase tracking-wider">Subtotal</span>
+              <div className="text-right">
+                <span className="font-display text-lg tabular-nums text-highlight">{movementsTotal.toFixed(1)}</span>
+                <span className="text-xs text-muted-foreground tabular-nums ml-1">/ {TOTAL_MAX}</span>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Collective */}
@@ -483,45 +588,47 @@ const Index = () => {
           <SectionTitle index="02" title="Collective Mark" subtitle="Rider position, seat & effect of aids" />
 
           <div className="bg-card border border-border rounded-xl overflow-hidden shadow-soft">
-            <table className="w-full text-sm">
-              <tbody>
-                <tr>
-                  <td className="px-3 py-4 w-12 text-center">
-                    <span className="inline-grid place-items-center h-7 w-7 rounded-full border border-border font-display text-xs">1</span>
-                  </td>
-                  <td className="px-3 py-4">
-                    Rider's position and seat; correctness and effect of the aids
-                  </td>
-                  <td className="px-1 py-2 w-24">
-                    <NumInput value={collective} onChange={setCollective} placeholder="Mark" accent />
-                  </td>
-                  <td className="px-1 py-2 w-24">
-                    <NumInput value={collectiveCorrection} onChange={setCollectiveCorrection} placeholder="Corr." />
-                  </td>
-                  <td className="px-3 py-4 w-16 text-center text-muted-foreground text-xs">×{COLLECTIVE_COEF}</td>
-                  <td className="px-3 py-4 w-24 text-center font-display text-lg text-highlight tabular-nums">
-                    {collectiveFinal ? collectiveFinal.toFixed(1) : "—"}
-                  </td>
-                  <td className="px-1 py-2 w-44">
-                    <input
-                      className="w-full bg-transparent rounded-md px-2 py-1.5 text-xs outline-none focus:bg-background focus:ring-1 focus:ring-ring transition-all"
-                      placeholder="Remarks"
-                      value={collectiveRemarks}
-                      onChange={(e) => setCollectiveRemarks(e.target.value)}
-                    />
-                  </td>
-                </tr>
-                <tr className="border-t-2 border-foreground/20 bg-muted/40">
-                  <td colSpan={2} className="px-3 py-3 font-display text-sm uppercase tracking-wider">Total</td>
-                  <td colSpan={2} className="px-3 py-3 text-center text-xs text-muted-foreground tabular-nums">/ {GRAND_TOTAL_MAX}</td>
-                  <td></td>
-                  <td className="px-3 py-3 text-center font-display text-lg text-highlight tabular-nums">
-                    {grandTotal.toFixed(1)}
-                  </td>
-                  <td></td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm min-w-[640px]">
+                <tbody>
+                  <tr>
+                    <td className="px-3 py-4 w-12 text-center">
+                      <span className="inline-grid place-items-center h-7 w-7 rounded-full border border-border font-display text-xs">1</span>
+                    </td>
+                    <td className="px-3 py-4">
+                      Rider's position and seat; correctness and effect of the aids
+                    </td>
+                    <td className="px-1 py-2 w-24">
+                      <NumInput value={collective} onChange={setCollective} placeholder="Mark" accent />
+                    </td>
+                    <td className="px-1 py-2 w-24">
+                      <NumInput value={collectiveCorrection} onChange={setCollectiveCorrection} placeholder="Corr." />
+                    </td>
+                    <td className="px-3 py-4 w-16 text-center text-muted-foreground text-xs">×{COLLECTIVE_COEF}</td>
+                    <td className="px-3 py-4 w-24 text-center font-display text-lg text-highlight tabular-nums">
+                      {collectiveFinal ? collectiveFinal.toFixed(1) : "—"}
+                    </td>
+                    <td className="px-1 py-2 w-44">
+                      <input
+                        className="w-full bg-transparent rounded-md px-2 py-1.5 text-xs outline-none focus:bg-background focus:ring-1 focus:ring-ring transition-all"
+                        placeholder="Remarks"
+                        value={collectiveRemarks}
+                        onChange={(e) => setCollectiveRemarks(e.target.value)}
+                      />
+                    </td>
+                  </tr>
+                  <tr className="border-t-2 border-foreground/20 bg-muted/40">
+                    <td colSpan={2} className="px-3 py-3 font-display text-sm uppercase tracking-wider">Total</td>
+                    <td colSpan={2} className="px-3 py-3 text-center text-xs text-muted-foreground tabular-nums">/ {GRAND_TOTAL_MAX}</td>
+                    <td></td>
+                    <td className="px-3 py-3 text-center font-display text-lg text-highlight tabular-nums">
+                      {grandTotal.toFixed(1)}
+                    </td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </section>
 
@@ -529,8 +636,8 @@ const Index = () => {
         <section className="mb-8 print:mb-4">
           <SectionTitle index="03" title="Penalties & Final Score" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            <div className="lg:col-span-3 bg-card border border-border rounded-xl p-6 shadow-soft">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
+            <div className="lg:col-span-3 bg-card border border-border rounded-xl p-4 sm:p-6 shadow-soft">
               <h3 className="font-display text-lg mb-4">Deductions</h3>
               <ul className="text-xs text-muted-foreground space-y-1 mb-5 leading-relaxed">
                 <li>• 1st course error = −0.5 percentage point</li>
@@ -591,11 +698,11 @@ const Index = () => {
 
             {/* Score card */}
             <div className="lg:col-span-2">
-              <div className="relative overflow-hidden bg-primary text-primary-foreground rounded-xl p-6 shadow-card h-full flex flex-col justify-between">
+              <div className="relative overflow-hidden bg-primary text-primary-foreground rounded-xl p-5 sm:p-6 shadow-card h-full flex flex-col justify-between">
                 <div className="absolute -top-12 -right-12 h-40 w-40 rounded-full bg-highlight/20 blur-2xl" />
                 <div className="relative">
                   <div className="text-[10px] uppercase tracking-[0.25em] opacity-70">Total Score</div>
-                  <div className="font-display text-6xl mt-3 tabular-nums leading-none">
+                  <div className="font-display text-5xl sm:text-6xl mt-3 tabular-nums leading-none break-all">
                     {eliminated ? (
                       <span className="text-destructive-foreground">—</span>
                     ) : (
@@ -652,8 +759,40 @@ const Index = () => {
         </section>
       </main>
 
-      <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground print:hidden">
-        FEI Young Rider · Appendix A · Interactive Scoring Sheet
+      {/* Mobile sticky action bar */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur-md print:hidden">
+        <div className="flex items-center gap-2 px-3 py-2">
+          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground" title={savedLabel}>
+            <span className={`h-1.5 w-1.5 rounded-full ${savedAt ? "bg-highlight" : "bg-muted-foreground/40"}`} />
+            <span className="tabular-nums">{savedAt ? "Saved" : "—"}</span>
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            {hasDraft && (
+              <button
+                onClick={loadDraft}
+                className="text-xs px-2.5 py-1.5 rounded-md border border-border hover:bg-muted transition-colors"
+              >
+                Load
+              </button>
+            )}
+            <button
+              onClick={reset}
+              className="text-xs px-2.5 py-1.5 rounded-md border border-border hover:bg-muted transition-colors"
+            >
+              Reset
+            </button>
+            <button
+              onClick={exportPdf}
+              className="text-xs px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              Export
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <footer className="border-t border-border py-6 pb-20 md:pb-6 text-center text-xs text-muted-foreground print:hidden">
+        {info.label} · {info.appendix} · Interactive Scoring Sheet
       </footer>
     </div>
   );
