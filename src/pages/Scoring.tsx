@@ -807,7 +807,7 @@ const Index = () => {
                 <div className="absolute -top-12 -right-12 h-40 w-40 rounded-full bg-highlight/20 blur-2xl" />
                 <div className="relative">
                   <div className="text-[10px] uppercase tracking-[0.25em] opacity-70">Total Score</div>
-                  <div className="font-display text-5xl sm:text-6xl mt-3 tabular-nums leading-none break-all">
+                  <div className="font-display text-5xl sm:text-6xl mt-3 tabular-nums leading-none whitespace-nowrap">
                     {eliminated ? (
                       <span className="text-destructive-foreground">—</span>
                     ) : (
