@@ -237,7 +237,7 @@ const Index = () => {
   /* ---------- export / print ---------- */
   const exportPdf = () => {
     const safe = (s: string) => s.replace(/[^a-z0-9-_]+/gi, "-").replace(/^-+|-+$/g, "") || "untitled";
-    const fname = `young-rider_${safe(meta.event || "event")}_${safe(meta.date || "date")}`;
+    const fname = `${testId}_${safe(meta.event || "event")}_${safe(meta.date || "date")}`;
     const prev = document.title;
     document.title = fname;
     window.print();
