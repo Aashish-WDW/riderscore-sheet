@@ -405,6 +405,7 @@ const Index = () => {
             onClick={() => {
               if (confirm("Reset all scores?")) {
                 setScores({});
+                setCoefficients({});
                 setCorrections({});
                 setRemarks({});
                 setCollective("");
