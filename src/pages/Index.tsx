@@ -27,6 +27,15 @@ const MOVEMENTS: Movement[] = [
   { no: "16", letters: "KAF", test: "Collected trot", coefficient: 1, directive: "Cadence; collection; balance; uphill tendency." },
   { no: "17", letters: "FXH", test: "Change rein, flying change at X", coefficient: 2, directive: "Straightness; balance; clean, expressive flying change at the marker." },
   { no: "18", letters: "C", test: "Collected canter", coefficient: 1, directive: "Quality of canter; collection; balance; preparation for next movement." },
+  { no: "19", letters: "MXK", test: "Extended canter\nFlying change at K", coefficient: 2, directive: "Ground cover; balance; clear lengthening; quality and straightness of flying change." },
+  { no: "20", letters: "A\nDB", test: "Down centre line\nHalf-pass right in canter", coefficient: 2, directive: "Straightness on centre line; bend; cadence; uphill balance." },
+  { no: "21", letters: "B\nBFA", test: "Flying change\nCollected canter", coefficient: 2, directive: "Clean, expressive flying change; balance and rhythm of collected canter." },
+  { no: "22", letters: "A\nDE", test: "Down centre line\nHalf-pass left in canter", coefficient: 2, directive: "Straightness on centre line; bend; cadence; uphill balance." },
+  { no: "23", letters: "E\nEKA", test: "Flying change\nCollected canter", coefficient: 2, directive: "Clean, expressive flying change; balance and rhythm of collected canter." },
+  { no: "24", letters: "A\nL", test: "Down centre line\n5 flying changes every 4th stride", coefficient: 2, directive: "Straightness; regularity of strides; expression and accuracy of changes." },
+  { no: "25", letters: "C\nHXF", test: "Track right\nExtended trot", coefficient: 2, directive: "Lengthening of frame and stride; impulsion; balance; clear transitions." },
+  { no: "26", letters: "FAK", test: "Collected trot\nHalt at L, immobility, salute", coefficient: 1, directive: "Quality of collected trot; straight, square, balanced halt; immobility." },
+  { no: "27", letters: "", test: "Paces (freedom and regularity)", coefficient: 1, directive: "Regularity, freedom and clarity of all three paces." },
 ];
 
 const COLLECTIVE_MAX = 10;
