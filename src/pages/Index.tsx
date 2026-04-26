@@ -51,10 +51,10 @@ const Index = () => {
         <div className="mx-auto max-w-[1200px] px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-md bg-primary text-primary-foreground grid place-items-center font-display font-semibold">
-              FEI
+              H
             </div>
             <div>
-              <div className="font-display text-lg leading-tight">Scoring System</div>
+              <div className="font-display text-lg leading-tight">Horsey</div>
               <div className="text-xs text-muted-foreground tracking-wide uppercase">Dressage · Interactive sheets</div>
             </div>
           </div>
@@ -121,7 +121,7 @@ const Index = () => {
       </main>
 
       <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-        FEI Dressage · Interactive Scoring Sheets
+        Horsey · FEI Dressage Interactive Scoring Sheets
       </footer>
     </div>
   );
