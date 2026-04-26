@@ -737,7 +737,9 @@ const Index = () => {
 
         {/* Penalties + Score */}
         <section className="mb-8 print:mb-4">
-          <SectionTitle index="03" title="Penalties & Final Score" />
+          <div className="mb-3">
+            <SectionTitle index="03" title="Penalties & Final Score" />
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6">
             <div className="lg:col-span-3 bg-card border border-border rounded-xl p-4 sm:p-6 shadow-soft">
