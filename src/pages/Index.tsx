@@ -54,6 +54,7 @@ const Index = () => {
 
   const [scores, setScores] = useState<Record<string, string>>({});
   const [corrections, setCorrections] = useState<Record<string, string>>({});
+  const [coefficients, setCoefficients] = useState<Record<string, string>>({});
   const [remarks, setRemarks] = useState<Record<string, string>>({});
   const [collective, setCollective] = useState<string>("");
   const [collectiveCorrection, setCollectiveCorrection] = useState<string>("");
@@ -69,13 +70,18 @@ const Index = () => {
     return isNaN(r) ? 0 : r;
   };
 
+  const getCoef = (m: Movement) => {
+    const c = parseFloat(coefficients[m.no] ?? "");
+    return isNaN(c) ? m.coefficient : c;
+  };
+
   const finalMarks = useMemo(() => {
     const map: Record<string, number> = {};
     MOVEMENTS.forEach((m) => {
-      map[m.no] = getEffective(m.no, scores[m.no] || "", corrections[m.no] || "") * m.coefficient;
+      map[m.no] = getEffective(m.no, scores[m.no] || "", corrections[m.no] || "") * getCoef(m);
     });
     return map;
-  }, [scores, corrections]);
+  }, [scores, corrections, coefficients]);
 
   const movementsTotal = useMemo(
     () => Object.values(finalMarks).reduce((a, b) => a + b, 0),
@@ -218,7 +224,21 @@ const Index = () => {
                     onChange={(e) => updateCorrection(m.no, e.target.value)}
                   />
                 </td>
-                <td className="border border-foreground p-1 text-center"></td>
+                <td className="border border-foreground p-0 text-center">
+                  <input
+                    type="number"
+                    min={1}
+                    max={10}
+                    step={1}
+                    className="w-full h-full text-center bg-transparent outline-none p-1 focus:bg-accent"
+                    value={coefficients[m.no] ?? ""}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v !== "" && (parseFloat(v) < 1 || parseFloat(v) > 10)) return;
+                      setCoefficients((c) => ({ ...c, [m.no]: v }));
+                    }}
+                  />
+                </td>
                 <td className="border border-foreground p-1 text-center font-semibold">
                   {finalMarks[m.no] ? finalMarks[m.no].toFixed(1) : ""}
                 </td>
@@ -385,6 +405,7 @@ const Index = () => {
             onClick={() => {
               if (confirm("Reset all scores?")) {
                 setScores({});
+                setCoefficients({});
                 setCorrections({});
                 setRemarks({});
                 setCollective("");
