@@ -473,7 +473,7 @@ const Index = () => {
 
         {/* Movements */}
         <section className="mb-6 sm:mb-8 print:mb-4">
-          <div className="flex flex-wrap items-end justify-between mb-3 px-1 gap-2">
+          <div className="flex flex-wrap items-center justify-between mb-3 gap-2">
             <SectionTitle index="01" title="Movements" subtitle="Score 0–10 · ↑↓ rows · → field · Enter next" />
             <button
               onClick={jumpToNextEmpty}
