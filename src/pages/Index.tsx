@@ -375,7 +375,7 @@ const Index = () => {
                         key={m.no}
                         className={`border-t border-border transition-colors ${
                           i % 2 === 0 ? "bg-background" : "bg-muted/20"
-                        } hover:bg-accent/30`}
+                        } hover:bg-accent/40 focus-within:bg-accent/60`}
                       >
                         <td className="px-3 py-3 text-center">
                           <span className="inline-grid place-items-center h-7 w-7 rounded-full border border-border font-display text-xs tabular-nums">
@@ -392,6 +392,10 @@ const Index = () => {
                             onChange={(v) => handleScore(m.no, v)}
                             placeholder="—"
                             accent
+                            data-grid="1"
+                            data-row={i}
+                            data-col={0}
+                            onKeyDown={handleGridKey}
                           />
                         </td>
                         <td className="px-1 py-2">
@@ -399,6 +403,10 @@ const Index = () => {
                             value={corrections[m.no] || ""}
                             onChange={(v) => handleCorrection(m.no, v)}
                             placeholder="—"
+                            data-grid="1"
+                            data-row={i}
+                            data-col={1}
+                            onKeyDown={handleGridKey}
                           />
                         </td>
                         <td className="px-1 py-2">
