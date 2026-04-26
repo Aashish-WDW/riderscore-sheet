@@ -1,7 +1,13 @@
 import * as React from "react";
 import { useMemo, useState, useEffect, useRef, useCallback, KeyboardEvent } from "react";
+import { Link, useParams } from "react-router-dom";
 
-const STORAGE_KEY = "yr-scoring-draft-v1";
+const TEST_INFO: Record<string, { label: string; appendix: string; abbr: string }> = {
+  "young-rider": { label: "Young Rider", appendix: "Appendix A", abbr: "YR" },
+  "junior": { label: "Junior", appendix: "Appendix C", abbr: "JR" },
+  "children-i": { label: "Children I", appendix: "Appendix D", abbr: "C1" },
+  "children-ii": { label: "Children II", appendix: "Appendix E", abbr: "C2" },
+};
 
 type Movement = {
   no: string;
