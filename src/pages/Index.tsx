@@ -5,27 +5,28 @@ type Movement = {
   letters: string;
   test: string;
   coefficient: number;
+  directive: string;
 };
 
 const MOVEMENTS: Movement[] = [
-  { no: "1", letters: "A\nX", test: "Enter in working trot\nHalt, salute. Proceed in working trot", coefficient: 1 },
-  { no: "2", letters: "C\nMXK", test: "Track to the left\nChange rein in medium trot", coefficient: 1 },
-  { no: "3", letters: "K\nA", test: "Working trot\nWorking canter left", coefficient: 1 },
-  { no: "4", letters: "AFB", test: "Medium canter", coefficient: 1 },
-  { no: "5", letters: "B", test: "Working canter", coefficient: 1 },
-  { no: "6", letters: "BM\nMC", test: "Half-circle 20m\nWorking trot", coefficient: 1 },
-  { no: "7", letters: "C\nHXF", test: "Medium walk\nChange rein in extended walk", coefficient: 2 },
-  { no: "8", letters: "F\nA", test: "Medium walk\nCollected trot", coefficient: 1 },
-  { no: "9", letters: "AK\nKE", test: "Shoulder-in left\nCircle left 10m", coefficient: 2 },
-  { no: "10", letters: "EH\nHC", test: "Shoulder-in left\nCollected trot", coefficient: 2 },
-  { no: "11", letters: "CM\nMB", test: "Shoulder-in right\nCircle right 10m", coefficient: 2 },
-  { no: "12", letters: "BF\nFA", test: "Shoulder-in right\nCollected trot", coefficient: 2 },
-  { no: "13", letters: "A\nDX", test: "Down centre line\nHalf-pass to the left", coefficient: 2 },
-  { no: "14", letters: "XG\nC", test: "Half-pass to the right\nTrack right", coefficient: 2 },
-  { no: "15", letters: "MXK", test: "Extended trot", coefficient: 2 },
-  { no: "16", letters: "KAF", test: "Collected trot", coefficient: 1 },
-  { no: "17", letters: "FXH", test: "Change rein, flying change at X", coefficient: 2 },
-  { no: "18", letters: "C", test: "Collected canter", coefficient: 1 },
+  { no: "1", letters: "A\nX", test: "Enter in working trot\nHalt, salute. Proceed in working trot", coefficient: 1, directive: "Straightness; quality of trot; balance of transitions; immobility; willing halt." },
+  { no: "2", letters: "C\nMXK", test: "Track to the left\nChange rein in medium trot", coefficient: 1, directive: "Regularity, elasticity of steps; engagement; uphill tendency; straightness." },
+  { no: "3", letters: "K\nA", test: "Working trot\nWorking canter left", coefficient: 1, directive: "Quality of trot and canter; balance and fluency of transition." },
+  { no: "4", letters: "AFB", test: "Medium canter", coefficient: 1, directive: "Regularity; impulsion; balance; clear lengthening of frame and stride." },
+  { no: "5", letters: "B", test: "Working canter", coefficient: 1, directive: "Smoothness and balance of transition; engagement of hindquarters." },
+  { no: "6", letters: "BM\nMC", test: "Half-circle 20m\nWorking trot", coefficient: 1, directive: "Shape and size of half-circle; bend; balance of transition." },
+  { no: "7", letters: "C\nHXF", test: "Medium walk\nChange rein in extended walk", coefficient: 2, directive: "Regularity and quality of walk; clear over-track; relaxation; freedom of shoulder." },
+  { no: "8", letters: "F\nA", test: "Medium walk\nCollected trot", coefficient: 1, directive: "Quality of walk; smooth, balanced and prompt transition." },
+  { no: "9", letters: "AK\nKE", test: "Shoulder-in left\nCircle left 10m", coefficient: 2, directive: "Correct angle and bend; engagement; regularity; size and balance of circle." },
+  { no: "10", letters: "EH\nHC", test: "Shoulder-in left\nCollected trot", coefficient: 2, directive: "Consistent angle and bend; cadence; smooth transition to collected trot." },
+  { no: "11", letters: "CM\nMB", test: "Shoulder-in right\nCircle right 10m", coefficient: 2, directive: "Correct angle and bend; engagement; regularity; size and balance of circle." },
+  { no: "12", letters: "BF\nFA", test: "Shoulder-in right\nCollected trot", coefficient: 2, directive: "Consistent angle and bend; cadence; smooth transition to collected trot." },
+  { no: "13", letters: "A\nDX", test: "Down centre line\nHalf-pass to the left", coefficient: 2, directive: "Straightness on centre line; correct bend; crossing of legs; fluency." },
+  { no: "14", letters: "XG\nC", test: "Half-pass to the right\nTrack right", coefficient: 2, directive: "Bend and angle; engagement; regularity; quality of turn." },
+  { no: "15", letters: "MXK", test: "Extended trot", coefficient: 2, directive: "Lengthening of frame and stride; impulsion; balance; clear transitions." },
+  { no: "16", letters: "KAF", test: "Collected trot", coefficient: 1, directive: "Cadence; collection; balance; uphill tendency." },
+  { no: "17", letters: "FXH", test: "Change rein, flying change at X", coefficient: 2, directive: "Straightness; balance; clean, expressive flying change at the marker." },
+  { no: "18", letters: "C", test: "Collected canter", coefficient: 1, directive: "Quality of canter; collection; balance; preparation for next movement." },
 ];
 
 const COLLECTIVE_MAX = 10;
