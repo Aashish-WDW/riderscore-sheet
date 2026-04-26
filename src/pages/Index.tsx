@@ -686,6 +686,15 @@ const Th = ({ children, className = "" }: { children: React.ReactNode; className
   <th className={`px-3 py-3 text-left font-medium ${className}`}>{children}</th>
 );
 
+type NumInputProps = {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  accent?: boolean;
+  min?: number;
+  step?: number;
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "min" | "step" | "placeholder">;
+
 const NumInput = ({
   value,
   onChange,
@@ -693,14 +702,9 @@ const NumInput = ({
   accent = false,
   min = 0,
   step = 0.5,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  placeholder?: string;
-  accent?: boolean;
-  min?: number;
-  step?: number;
-}) => (
+  className,
+  ...rest
+}: NumInputProps) => (
   <input
     type="number"
     inputMode="decimal"
@@ -714,7 +718,8 @@ const NumInput = ({
       accent
         ? "border-border focus:border-highlight focus:bg-background focus:ring-2 focus:ring-highlight/20"
         : "border-transparent hover:border-border focus:border-ring focus:bg-background"
-    }`}
+    } ${className ?? ""}`}
+    {...rest}
   />
 );
 
