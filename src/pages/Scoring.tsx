@@ -59,6 +59,9 @@ const COURSE_ERRORS = [
 ];
 
 const Index = () => {
+  const { testId = "young-rider" } = useParams<{ testId: string }>();
+  const info = TEST_INFO[testId] ?? TEST_INFO["young-rider"];
+  const STORAGE_KEY = `scoring-draft-v1:${testId}`;
   const [meta, setMeta] = useState({
     event: "",
     date: "",
