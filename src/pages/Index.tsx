@@ -340,21 +340,29 @@ const Index = () => {
 
         {/* Movements */}
         <section className="mb-8 print:mb-4">
-          <SectionTitle index="01" title="Movements" subtitle="Score each movement from 0 to 10" />
+          <div className="flex items-end justify-between mb-3 px-1">
+            <SectionTitle index="01" title="Movements" subtitle="Score 0–10 · ↑↓ move rows · → jump field · Enter next" />
+            <button
+              onClick={jumpToNextEmpty}
+              className="text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted transition-colors print:hidden"
+            >
+              Jump to next empty ↵
+            </button>
+          </div>
 
           <div className="bg-card border border-border rounded-xl overflow-hidden shadow-soft">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-muted/60 text-[11px] uppercase tracking-wider text-muted-foreground">
+            <div className="overflow-x-auto max-h-[70vh] print:max-h-none print:overflow-visible">
+              <table className="w-full text-sm table-fixed">
+                <thead className="sticky top-0 z-10">
+                  <tr className="bg-muted text-[11px] uppercase tracking-wider text-muted-foreground shadow-soft">
                     <Th className="w-12 text-center">No.</Th>
                     <Th className="w-20 text-center">Letters</Th>
-                    <Th>Test</Th>
+                    <Th className="w-auto">Test</Th>
                     <Th className="w-20 text-center">Mark</Th>
                     <Th className="w-20 text-center">Correction</Th>
                     <Th className="w-16 text-center">Coeff.</Th>
                     <Th className="w-20 text-center">Final</Th>
-                    <Th className="w-[280px]">Directive Ideas</Th>
+                    <Th className="w-[26%]">Directive Ideas</Th>
                     <Th className="w-44">Remarks</Th>
                   </tr>
                 </thead>
