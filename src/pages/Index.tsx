@@ -38,16 +38,15 @@ const MOVEMENTS: Movement[] = [
   { no: "27", letters: "A\nX", test: "Down the centre line\nHalt – immobility – salute", coefficient: 1, directive: "The straightness, the transitions and the halt." },
 ];
 
-const COLLECTIVE_MAX = 10;
 const COLLECTIVE_COEF = 2;
 const TOTAL_MAX = 270;
 const GRAND_TOTAL_MAX = 290;
 
 const COURSE_ERRORS = [
   { label: "No error", value: 0 },
-  { label: "1st error - 0.5%", value: 0.5 },
-  { label: "2nd error - 1%", value: 1 },
-  { label: "3rd error - Elimination", value: -1 },
+  { label: "1st error · −0.5%", value: 0.5 },
+  { label: "2nd error · −1%", value: 1 },
+  { label: "3rd error · Elimination", value: -1 },
 ];
 
 const Index = () => {
@@ -72,7 +71,7 @@ const Index = () => {
   const [otherErrors, setOtherErrors] = useState<number>(0);
   const [organisers, setOrganisers] = useState<string>("");
 
-  const getEffective = (no: string, raw: string, correction: string) => {
+  const getEffective = (raw: string, correction: string) => {
     const c = parseFloat(correction);
     if (!isNaN(c)) return c;
     const r = parseFloat(raw);
@@ -87,10 +86,16 @@ const Index = () => {
   const finalMarks = useMemo(() => {
     const map: Record<string, number> = {};
     MOVEMENTS.forEach((m) => {
-      map[m.no] = getEffective(m.no, scores[m.no] || "", corrections[m.no] || "") * getCoef(m);
+      map[m.no] = getEffective(scores[m.no] || "", corrections[m.no] || "") * getCoef(m);
     });
     return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scores, corrections, coefficients]);
+
+  const filledCount = useMemo(
+    () => MOVEMENTS.filter((m) => (scores[m.no] || corrections[m.no] || "").toString().trim() !== "").length,
+    [scores, corrections]
+  );
 
   const movementsTotal = useMemo(
     () => Object.values(finalMarks).reduce((a, b) => a + b, 0),
@@ -104,7 +109,6 @@ const Index = () => {
   }, [collective, collectiveCorrection]);
 
   const grandTotal = movementsTotal + collectiveFinal;
-
   const eliminated = courseError === -1;
 
   const percentage = useMemo(() => {
@@ -113,325 +117,460 @@ const Index = () => {
     return Math.max(0, pct - courseError - otherErrors * 2);
   }, [grandTotal, courseError, otherErrors, eliminated]);
 
-  const updateScore = (no: string, val: string) => {
+  const handleScore = (no: string, val: string) => {
     if (val !== "" && (parseFloat(val) < 0 || parseFloat(val) > 10)) return;
     setScores((s) => ({ ...s, [no]: val }));
   };
-
-  const updateCorrection = (no: string, val: string) => {
+  const handleCorrection = (no: string, val: string) => {
     if (val !== "" && (parseFloat(val) < 0 || parseFloat(val) > 10)) return;
     setCorrections((s) => ({ ...s, [no]: val }));
   };
 
+  const reset = () => {
+    if (!confirm("Reset all scores and entries?")) return;
+    setScores({});
+    setCorrections({});
+    setCoefficients({});
+    setRemarks({});
+    setCollective("");
+    setCollectiveCorrection("");
+    setCollectiveRemarks("");
+    setCourseError(0);
+    setOtherErrors(0);
+  };
+
+  const progressPct = (filledCount / MOVEMENTS.length) * 100;
+
   return (
-    <div className="min-h-screen bg-muted py-6 px-4 print:p-0 print:bg-background">
-      <div className="mx-auto max-w-[960px] bg-background shadow-lg p-6 print:shadow-none">
-        {/* Header */}
-        <div className="relative text-center mb-3">
-          <h1 className="text-base font-bold underline inline-block">YOUNG RIDER</h1>
-          <span className="absolute right-0 top-0 font-bold underline">Appendix 'A'</span>
-        </div>
-
-        {/* Meta info */}
-        <div className="space-y-1.5 text-sm mb-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <label className="font-medium">Event:</label>
-            <input
-              className="flex-1 min-w-[180px] border-b border-dotted border-foreground bg-transparent px-1 outline-none focus:border-primary"
-              value={meta.event}
-              onChange={(e) => setMeta({ ...meta, event: e.target.value })}
-            />
-            <label className="font-medium">Date:</label>
-            <input
-              className="w-32 border-b border-dotted border-foreground bg-transparent px-1 outline-none focus:border-primary"
-              value={meta.date}
-              onChange={(e) => setMeta({ ...meta, date: e.target.value })}
-            />
-            <label className="font-medium">Judge:</label>
-            <input
-              className="flex-1 min-w-[140px] border-b border-dotted border-foreground bg-transparent px-1 outline-none focus:border-primary"
-              value={meta.judge}
-              onChange={(e) => setMeta({ ...meta, judge: e.target.value })}
-            />
-            <label className="font-medium">Position</label>
-            <input
-              className="w-10 h-7 border border-foreground text-center bg-transparent outline-none focus:border-primary"
-              value={meta.position}
-              onChange={(e) => setMeta({ ...meta, position: e.target.value })}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <label className="font-medium">Competitor No:</label>
-            <input
-              className="w-24 border-b border-dotted border-foreground bg-transparent px-1 outline-none focus:border-primary"
-              value={meta.competitorNo}
-              onChange={(e) => setMeta({ ...meta, competitorNo: e.target.value })}
-            />
-            <label className="font-medium">Name:</label>
-            <input
-              className="flex-1 min-w-[180px] border-b border-dotted border-foreground bg-transparent px-1 outline-none focus:border-primary"
-              value={meta.name}
-              onChange={(e) => setMeta({ ...meta, name: e.target.value })}
-            />
-            <label className="font-medium">Horse:</label>
-            <input
-              className="flex-1 min-w-[180px] border-b border-dotted border-foreground bg-transparent px-1 outline-none focus:border-primary"
-              value={meta.horse}
-              onChange={(e) => setMeta({ ...meta, horse: e.target.value })}
-            />
-          </div>
-
-          <div className="flex justify-between text-xs pt-1">
-            <span>Time: 6'30" (for information only)</span>
-            <span>Minimum age of horse: 6 Years</span>
-          </div>
-        </div>
-
-        {/* Movements table */}
-        <table className="w-full border-collapse text-xs">
-          <thead>
-            <tr className="bg-secondary">
-              <th className="border border-foreground p-1 w-10">No.</th>
-              <th className="border border-foreground p-1 w-14">Letters</th>
-              <th className="border border-foreground p-1">Test</th>
-              <th className="border border-foreground p-1 w-14">Marks</th>
-              <th className="border border-foreground p-1 w-16">Mark</th>
-              <th className="border border-foreground p-1 w-16">Correction</th>
-              <th className="border border-foreground p-1 w-14">Coeff.</th>
-              <th className="border border-foreground p-1 w-16">Final</th>
-              <th className="border border-foreground p-1 w-32">Directive Ideas</th>
-              <th className="border border-foreground p-1 w-28">Remarks</th>
-            </tr>
-          </thead>
-          <tbody>
-            {MOVEMENTS.map((m) => (
-              <tr key={m.no}>
-                <td className="border border-foreground p-1 text-center">{m.no}</td>
-                <td className="border border-foreground p-1 text-center whitespace-pre-line">{m.letters}</td>
-                <td className="border border-foreground p-1 whitespace-pre-line">{m.test}</td>
-                <td className="border border-foreground p-1 text-center">10</td>
-                <td className="border border-foreground p-0">
-                  <input
-                    type="number"
-                    min={0}
-                    max={10}
-                    step={0.5}
-                    className="w-full h-full text-center bg-transparent outline-none p-1 focus:bg-accent"
-                    value={scores[m.no] || ""}
-                    onChange={(e) => updateScore(m.no, e.target.value)}
-                  />
-                </td>
-                <td className="border border-foreground p-0">
-                  <input
-                    type="number"
-                    min={0}
-                    max={10}
-                    step={0.5}
-                    className="w-full h-full text-center bg-transparent outline-none p-1 focus:bg-accent"
-                    value={corrections[m.no] || ""}
-                    onChange={(e) => updateCorrection(m.no, e.target.value)}
-                  />
-                </td>
-                <td className="border border-foreground p-0 text-center">
-                  <input
-                    type="number"
-                    min={1}
-                    max={10}
-                    step={1}
-                    className="w-full h-full text-center bg-transparent outline-none p-1 focus:bg-accent"
-                    value={coefficients[m.no] ?? ""}
-                    onChange={(e) => {
-                      const v = e.target.value;
-                      if (v !== "" && (parseFloat(v) < 1 || parseFloat(v) > 10)) return;
-                      setCoefficients((c) => ({ ...c, [m.no]: v }));
-                    }}
-                  />
-                </td>
-                <td className="border border-foreground p-1 text-center font-semibold">
-                  {finalMarks[m.no] ? finalMarks[m.no].toFixed(1) : ""}
-                </td>
-                <td className="border border-foreground p-1 text-[11px] leading-snug">{m.directive}</td>
-                <td className="border border-foreground p-0">
-                  <input
-                    className="w-full h-full bg-transparent outline-none p-1 focus:bg-accent"
-                    value={remarks[m.no] || ""}
-                    onChange={(e) => setRemarks((r) => ({ ...r, [m.no]: e.target.value }))}
-                  />
-                </td>
-              </tr>
-            ))}
-            <tr className="bg-secondary font-bold">
-              <td className="border border-foreground p-1 text-center" colSpan={3}>Total</td>
-              <td className="border border-foreground p-1 text-center">{TOTAL_MAX}</td>
-              <td className="border border-foreground p-1"></td>
-              <td className="border border-foreground p-1"></td>
-              <td className="border border-foreground p-1"></td>
-              <td className="border border-foreground p-1 text-center">{movementsTotal.toFixed(1)}</td>
-              <td className="border border-foreground p-1"></td>
-              <td className="border border-foreground p-1"></td>
-            </tr>
-          </tbody>
-        </table>
-
-        {/* Collective Mark */}
-        <div className="font-bold underline mt-4 mb-1.5 text-sm">Collective Mark</div>
-        <table className="w-full border-collapse text-xs">
-          <tbody>
-            <tr>
-              <td className="border border-foreground p-1 w-10 text-center">1.</td>
-              <td className="border border-foreground p-1 w-14"></td>
-              <td className="border border-foreground p-1">
-                Riders position and seat; correctness and effect of the aids
-              </td>
-              <td className="border border-foreground p-1 w-14 text-center">10</td>
-              <td className="border border-foreground p-0 w-16">
-                <input
-                  type="number"
-                  min={0}
-                  max={10}
-                  step={0.5}
-                  className="w-full h-full text-center bg-transparent outline-none p-1 focus:bg-accent"
-                  value={collective}
-                  onChange={(e) => setCollective(e.target.value)}
-                />
-              </td>
-              <td className="border border-foreground p-0 w-16">
-                <input
-                  type="number"
-                  min={0}
-                  max={10}
-                  step={0.5}
-                  className="w-full h-full text-center bg-transparent outline-none p-1 focus:bg-accent"
-                  value={collectiveCorrection}
-                  onChange={(e) => setCollectiveCorrection(e.target.value)}
-                />
-              </td>
-              <td className="border border-foreground p-1 w-14 text-center">{COLLECTIVE_COEF}</td>
-              <td className="border border-foreground p-1 w-16 text-center font-semibold">
-                {collectiveFinal ? collectiveFinal.toFixed(1) : ""}
-              </td>
-              <td className="border border-foreground p-1 w-32"></td>
-              <td className="border border-foreground p-0 w-28">
-                <input
-                  className="w-full h-full bg-transparent outline-none p-1 focus:bg-accent"
-                  value={collectiveRemarks}
-                  onChange={(e) => setCollectiveRemarks(e.target.value)}
-                />
-              </td>
-            </tr>
-            <tr className="bg-secondary font-bold">
-              <td className="border border-foreground p-1 text-center" colSpan={3}>Total</td>
-              <td className="border border-foreground p-1 text-center">{GRAND_TOTAL_MAX}</td>
-              <td className="border border-foreground p-1"></td>
-              <td className="border border-foreground p-1"></td>
-              <td className="border border-foreground p-1"></td>
-              <td className="border border-foreground p-1 text-center">{grandTotal.toFixed(1)}</td>
-              <td className="border border-foreground p-1"></td>
-              <td className="border border-foreground p-1"></td>
-            </tr>
-          </tbody>
-        </table>
-
-        {/* Penalty + final score */}
-        <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-7 mt-4 text-xs">
-          <div className="space-y-1.5 leading-relaxed">
-            <div className="font-semibold">To be deducted/penalty points</div>
-            <div>Errors of course are penalised</div>
-            <div>1st error &nbsp;&nbsp;&nbsp;= 0.5 Percentage point</div>
-            <div>2nd error &nbsp;&nbsp;= 1 Percentage point</div>
-            <div>3rd error &nbsp;&nbsp;&nbsp;= Elimination</div>
-            <div>Two (2) points to be deducted per other error.</div>
-
-            <div className="flex items-center gap-2 pt-2">
-              <label className="font-medium">Course error:</label>
-              <select
-                className="border border-foreground bg-background px-2 py-1 outline-none focus:border-primary"
-                value={courseError}
-                onChange={(e) => setCourseError(parseFloat(e.target.value))}
-              >
-                {COURSE_ERRORS.map((c) => (
-                  <option key={c.label} value={c.value}>{c.label}</option>
-                ))}
-              </select>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Top nav */}
+      <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-md print:hidden">
+        <div className="mx-auto max-w-[1200px] px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-md bg-primary text-primary-foreground grid place-items-center font-display font-semibold">
+              YR
             </div>
-
-            <div className="flex items-center gap-2">
-              <label className="font-medium">Other errors:</label>
-              <input
-                type="number"
-                min={0}
-                className="w-20 border border-foreground bg-background px-2 py-1 outline-none focus:border-primary"
-                value={otherErrors}
-                onChange={(e) => setOtherErrors(parseInt(e.target.value) || 0)}
-              />
-              <span className="text-muted-foreground">× -2 pts</span>
+            <div>
+              <div className="font-display text-lg leading-tight">Young Rider</div>
+              <div className="text-xs text-muted-foreground tracking-wide uppercase">Appendix A · Scoring</div>
             </div>
           </div>
 
-          <div>
-            <div className="border border-foreground p-3 mt-9 min-h-[80px]">
-              <div className="font-bold">TOTAL SCORE</div>
-              <div className="font-bold text-lg mt-2">
-                in % :{" "}
+          <div className="hidden md:flex items-center gap-4">
+            <div className="text-right">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Current</div>
+              <div className="font-display text-2xl tabular-nums">
                 {eliminated ? (
-                  <span className="text-destructive">ELIMINATED</span>
+                  <span className="text-destructive text-base">Eliminated</span>
                 ) : (
-                  <span className="text-primary">{percentage.toFixed(3)}%</span>
+                  <>
+                    <span className="text-highlight">{percentage.toFixed(3)}</span>
+                    <span className="text-muted-foreground text-base">%</span>
+                  </>
                 )}
               </div>
             </div>
+            <button
+              onClick={reset}
+              className="text-sm px-3 py-1.5 rounded-md border border-border hover:bg-muted transition-colors"
+            >
+              Reset
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="text-sm px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              Print / PDF
+            </button>
           </div>
         </div>
+        {/* Progress bar */}
+        <div className="h-0.5 bg-muted">
+          <div
+            className="h-full bg-highlight transition-all duration-500"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+      </header>
 
-        {/* Signatures */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10 text-xs">
-          <div>
-            <div className="font-bold mb-1">Organisers:</div>
-            <div className="text-muted-foreground italic">(exact address)</div>
+      <main className="mx-auto max-w-[1200px] px-6 py-8 print:px-4 print:py-2">
+        {/* Hero / Meta card */}
+        <section className="mb-8 print:mb-4">
+          <div className="flex items-end justify-between mb-4">
+            <div>
+              <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">FEI · Dressage Test</div>
+              <h1 className="font-display text-4xl md:text-5xl tracking-tight">
+                Young Rider <span className="italic text-highlight">scoring</span>
+              </h1>
+              <p className="text-sm text-muted-foreground mt-2">
+                Time 6′30″ · Minimum age of horse: 6 years
+              </p>
+            </div>
+            <div className="hidden lg:block text-right">
+              <div className="text-xs uppercase tracking-wider text-muted-foreground">Movements</div>
+              <div className="font-display text-3xl tabular-nums">
+                {filledCount}<span className="text-muted-foreground">/{MOVEMENTS.length}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-6 shadow-soft">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+              <Field label="Event" value={meta.event} onChange={(v) => setMeta({ ...meta, event: v })} />
+              <Field label="Date" value={meta.date} onChange={(v) => setMeta({ ...meta, date: v })} />
+              <Field label="Judge" value={meta.judge} onChange={(v) => setMeta({ ...meta, judge: v })} />
+              <Field label="Competitor No." value={meta.competitorNo} onChange={(v) => setMeta({ ...meta, competitorNo: v })} />
+              <Field label="Rider" value={meta.name} onChange={(v) => setMeta({ ...meta, name: v })} />
+              <Field label="Horse" value={meta.horse} onChange={(v) => setMeta({ ...meta, horse: v })} />
+              <Field label="Position" value={meta.position} onChange={(v) => setMeta({ ...meta, position: v })} />
+            </div>
+          </div>
+        </section>
+
+        {/* Movements */}
+        <section className="mb-8 print:mb-4">
+          <SectionTitle index="01" title="Movements" subtitle="Score each movement from 0 to 10" />
+
+          <div className="bg-card border border-border rounded-xl overflow-hidden shadow-soft">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/60 text-[11px] uppercase tracking-wider text-muted-foreground">
+                    <Th className="w-12 text-center">No.</Th>
+                    <Th className="w-20 text-center">Letters</Th>
+                    <Th>Test</Th>
+                    <Th className="w-20 text-center">Mark</Th>
+                    <Th className="w-20 text-center">Correction</Th>
+                    <Th className="w-16 text-center">Coeff.</Th>
+                    <Th className="w-20 text-center">Final</Th>
+                    <Th className="w-[280px]">Directive Ideas</Th>
+                    <Th className="w-44">Remarks</Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {MOVEMENTS.map((m, i) => {
+                    const final = finalMarks[m.no];
+                    const hasValue = final > 0;
+                    return (
+                      <tr
+                        key={m.no}
+                        className={`border-t border-border transition-colors ${
+                          i % 2 === 0 ? "bg-background" : "bg-muted/20"
+                        } hover:bg-accent/30`}
+                      >
+                        <td className="px-3 py-3 text-center">
+                          <span className="inline-grid place-items-center h-7 w-7 rounded-full border border-border font-display text-xs tabular-nums">
+                            {m.no}
+                          </span>
+                        </td>
+                        <td className="px-3 py-3 text-center font-mono text-xs whitespace-pre-line text-muted-foreground">
+                          {m.letters}
+                        </td>
+                        <td className="px-3 py-3 whitespace-pre-line leading-snug">{m.test}</td>
+                        <td className="px-1 py-2">
+                          <NumInput
+                            value={scores[m.no] || ""}
+                            onChange={(v) => handleScore(m.no, v)}
+                            placeholder="—"
+                            accent
+                          />
+                        </td>
+                        <td className="px-1 py-2">
+                          <NumInput
+                            value={corrections[m.no] || ""}
+                            onChange={(v) => handleCorrection(m.no, v)}
+                            placeholder="—"
+                          />
+                        </td>
+                        <td className="px-1 py-2">
+                          <NumInput
+                            value={coefficients[m.no] ?? ""}
+                            onChange={(v) => {
+                              if (v !== "" && (parseFloat(v) < 1 || parseFloat(v) > 10)) return;
+                              setCoefficients((c) => ({ ...c, [m.no]: v }));
+                            }}
+                            placeholder="—"
+                            min={1}
+                            step={1}
+                          />
+                        </td>
+                        <td className="px-3 py-3 text-center">
+                          <span
+                            className={`font-display tabular-nums text-base ${
+                              hasValue ? "text-highlight" : "text-muted-foreground/40"
+                            }`}
+                          >
+                            {hasValue ? final.toFixed(1) : "—"}
+                          </span>
+                        </td>
+                        <td className="px-3 py-3 text-xs leading-snug text-muted-foreground">
+                          {m.directive}
+                        </td>
+                        <td className="px-1 py-2">
+                          <input
+                            className="w-full bg-transparent rounded-md px-2 py-1.5 text-xs outline-none focus:bg-background focus:ring-1 focus:ring-ring transition-all"
+                            value={remarks[m.no] || ""}
+                            onChange={(e) => setRemarks((r) => ({ ...r, [m.no]: e.target.value }))}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  <tr className="border-t-2 border-foreground/20 bg-muted/40">
+                    <td colSpan={3} className="px-3 py-3 font-display text-sm uppercase tracking-wider">
+                      Subtotal
+                    </td>
+                    <td className="px-3 py-3 text-center text-xs text-muted-foreground tabular-nums">/ {TOTAL_MAX}</td>
+                    <td colSpan={2}></td>
+                    <td className="px-3 py-3 text-center font-display text-lg tabular-nums text-highlight">
+                      {movementsTotal.toFixed(1)}
+                    </td>
+                    <td colSpan={2}></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        {/* Collective */}
+        <section className="mb-8 print:mb-4">
+          <SectionTitle index="02" title="Collective Mark" subtitle="Rider position, seat & effect of aids" />
+
+          <div className="bg-card border border-border rounded-xl overflow-hidden shadow-soft">
+            <table className="w-full text-sm">
+              <tbody>
+                <tr>
+                  <td className="px-3 py-4 w-12 text-center">
+                    <span className="inline-grid place-items-center h-7 w-7 rounded-full border border-border font-display text-xs">1</span>
+                  </td>
+                  <td className="px-3 py-4">
+                    Rider's position and seat; correctness and effect of the aids
+                  </td>
+                  <td className="px-1 py-2 w-24">
+                    <NumInput value={collective} onChange={setCollective} placeholder="Mark" accent />
+                  </td>
+                  <td className="px-1 py-2 w-24">
+                    <NumInput value={collectiveCorrection} onChange={setCollectiveCorrection} placeholder="Corr." />
+                  </td>
+                  <td className="px-3 py-4 w-16 text-center text-muted-foreground text-xs">×{COLLECTIVE_COEF}</td>
+                  <td className="px-3 py-4 w-24 text-center font-display text-lg text-highlight tabular-nums">
+                    {collectiveFinal ? collectiveFinal.toFixed(1) : "—"}
+                  </td>
+                  <td className="px-1 py-2 w-44">
+                    <input
+                      className="w-full bg-transparent rounded-md px-2 py-1.5 text-xs outline-none focus:bg-background focus:ring-1 focus:ring-ring transition-all"
+                      placeholder="Remarks"
+                      value={collectiveRemarks}
+                      onChange={(e) => setCollectiveRemarks(e.target.value)}
+                    />
+                  </td>
+                </tr>
+                <tr className="border-t-2 border-foreground/20 bg-muted/40">
+                  <td colSpan={2} className="px-3 py-3 font-display text-sm uppercase tracking-wider">Total</td>
+                  <td colSpan={2} className="px-3 py-3 text-center text-xs text-muted-foreground tabular-nums">/ {GRAND_TOTAL_MAX}</td>
+                  <td></td>
+                  <td className="px-3 py-3 text-center font-display text-lg text-highlight tabular-nums">
+                    {grandTotal.toFixed(1)}
+                  </td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Penalties + Score */}
+        <section className="mb-8 print:mb-4">
+          <SectionTitle index="03" title="Penalties & Final Score" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-3 bg-card border border-border rounded-xl p-6 shadow-soft">
+              <h3 className="font-display text-lg mb-4">Deductions</h3>
+              <ul className="text-xs text-muted-foreground space-y-1 mb-5 leading-relaxed">
+                <li>• 1st course error = −0.5 percentage point</li>
+                <li>• 2nd course error = −1 percentage point</li>
+                <li>• 3rd course error = Elimination</li>
+                <li>• Other errors = −2 points each</li>
+              </ul>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                    Course error
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    {COURSE_ERRORS.map((c) => (
+                      <button
+                        key={c.label}
+                        onClick={() => setCourseError(c.value)}
+                        className={`text-xs px-3 py-2 rounded-md border transition-all ${
+                          courseError === c.value
+                            ? c.value === -1
+                              ? "bg-destructive text-destructive-foreground border-destructive"
+                              : "bg-primary text-primary-foreground border-primary"
+                            : "border-border hover:border-foreground/30 bg-background"
+                        }`}
+                      >
+                        {c.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                    Other errors
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setOtherErrors(Math.max(0, otherErrors - 1))}
+                      className="h-9 w-9 rounded-md border border-border hover:bg-muted transition-colors"
+                      aria-label="Decrease"
+                    >
+                      −
+                    </button>
+                    <div className="font-display text-2xl tabular-nums w-12 text-center">{otherErrors}</div>
+                    <button
+                      onClick={() => setOtherErrors(otherErrors + 1)}
+                      className="h-9 w-9 rounded-md border border-border hover:bg-muted transition-colors"
+                      aria-label="Increase"
+                    >
+                      +
+                    </button>
+                    <span className="text-xs text-muted-foreground">× −2 pts = −{(otherErrors * 2).toFixed(1)}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Score card */}
+            <div className="lg:col-span-2">
+              <div className="relative overflow-hidden bg-primary text-primary-foreground rounded-xl p-6 shadow-card h-full flex flex-col justify-between">
+                <div className="absolute -top-12 -right-12 h-40 w-40 rounded-full bg-highlight/20 blur-2xl" />
+                <div className="relative">
+                  <div className="text-[10px] uppercase tracking-[0.25em] opacity-70">Total Score</div>
+                  <div className="font-display text-6xl mt-3 tabular-nums leading-none">
+                    {eliminated ? (
+                      <span className="text-destructive-foreground">—</span>
+                    ) : (
+                      <>
+                        {percentage.toFixed(3)}
+                        <span className="text-2xl opacity-60 align-top ml-1">%</span>
+                      </>
+                    )}
+                  </div>
+                  {eliminated && (
+                    <div className="mt-3 inline-block px-2 py-1 bg-destructive text-destructive-foreground text-xs uppercase tracking-wider rounded">
+                      Eliminated
+                    </div>
+                  )}
+                </div>
+                <div className="relative mt-6 pt-4 border-t border-primary-foreground/20 text-xs opacity-70 grid grid-cols-2 gap-2">
+                  <div>
+                    <div className="opacity-70">Raw total</div>
+                    <div className="font-display text-base tabular-nums opacity-100 mt-0.5">
+                      {grandTotal.toFixed(1)} <span className="opacity-50">/ {GRAND_TOTAL_MAX}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="opacity-70">Deductions</div>
+                    <div className="font-display text-base tabular-nums opacity-100 mt-0.5">
+                      −{(courseError === -1 ? 0 : courseError + otherErrors * 2).toFixed(1)}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer / signatures */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-12">
+          <div className="bg-card border border-border rounded-xl p-6 shadow-soft">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Organisers</div>
             <textarea
               rows={3}
-              className="w-full mt-1 border-b border-dotted border-foreground bg-transparent outline-none focus:border-primary resize-none"
+              placeholder="Exact address…"
+              className="w-full bg-transparent outline-none resize-none text-sm focus:ring-1 focus:ring-ring rounded-md p-2 -m-2"
               value={organisers}
               onChange={(e) => setOrganisers(e.target.value)}
             />
           </div>
-          <div>
-            <div className="font-bold mb-1">Signature of Judge:</div>
-            <div className="border-b border-dotted border-foreground h-16"></div>
+          <div className="bg-card border border-border rounded-xl p-6 shadow-soft">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Signature of Judge</div>
+            <div className="border-b border-dashed border-border h-16" />
+            <div className="text-xs text-muted-foreground mt-2 italic">
+              {meta.judge ? meta.judge : "—"}
+            </div>
           </div>
-        </div>
+        </section>
+      </main>
 
-        {/* Actions */}
-        <div className="flex gap-2 mt-6 print:hidden">
-          <button
-            onClick={() => window.print()}
-            className="bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-90 transition"
-          >
-            Print / Save PDF
-          </button>
-          <button
-            onClick={() => {
-              if (confirm("Reset all scores?")) {
-                setScores({});
-                setCoefficients({});
-                setCorrections({});
-                setRemarks({});
-                setCollective("");
-                setCollectiveCorrection("");
-                setCollectiveRemarks("");
-                setCourseError(0);
-                setOtherErrors(0);
-              }
-            }}
-            className="border border-foreground px-4 py-2 text-sm font-medium hover:bg-accent transition"
-          >
-            Reset Scores
-          </button>
-        </div>
-      </div>
+      <footer className="border-t border-border py-6 text-center text-xs text-muted-foreground print:hidden">
+        FEI Young Rider · Appendix A · Interactive Scoring Sheet
+      </footer>
     </div>
   );
 };
+
+/* ---------- small components ---------- */
+
+const Field = ({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) => (
+  <label className="block">
+    <span className="block text-[10px] uppercase tracking-[0.15em] text-muted-foreground mb-1.5">
+      {label}
+    </span>
+    <input
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full bg-transparent border-b border-border focus:border-highlight outline-none py-1.5 text-sm transition-colors"
+    />
+  </label>
+);
+
+const Th = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+  <th className={`px-3 py-3 text-left font-medium ${className}`}>{children}</th>
+);
+
+const NumInput = ({
+  value,
+  onChange,
+  placeholder,
+  accent = false,
+  min = 0,
+  step = 0.5,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  accent?: boolean;
+  min?: number;
+  step?: number;
+}) => (
+  <input
+    type="number"
+    inputMode="decimal"
+    min={min}
+    max={10}
+    step={step}
+    value={value}
+    onChange={(e) => onChange(e.target.value)}
+    placeholder={placeholder}
+    className={`w-full text-center tabular-nums rounded-md py-1.5 text-sm outline-none transition-all bg-transparent border ${
+      accent
+        ? "border-border focus:border-highlight focus:bg-background focus:ring-2 focus:ring-highlight/20"
+        : "border-transparent hover:border-border focus:border-ring focus:bg-background"
+    }`}
+  />
+);
 
 export default Index;
