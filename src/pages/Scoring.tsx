@@ -329,7 +329,7 @@ const Index = () => {
             <div>
               <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-2">FEI · Dressage Test</div>
               <h1 className="font-display text-4xl md:text-5xl tracking-tight">
-                Young Rider <span className="italic text-highlight">scoring</span>
+                {info.label} <span className="italic text-highlight">scoring</span>
               </h1>
               <p className="text-sm text-muted-foreground mt-2">
                 Time 6′30″ · Minimum age of horse: 6 years
