@@ -537,6 +537,24 @@ const Field = ({
   </label>
 );
 
+const SectionTitle = ({
+  index,
+  title,
+  subtitle,
+}: {
+  index: string;
+  title: string;
+  subtitle?: string;
+}) => (
+  <div className="flex items-end justify-between mb-3 px-1">
+    <div className="flex items-baseline gap-3">
+      <span className="font-mono text-xs text-muted-foreground tabular-nums">{index}</span>
+      <h2 className="font-display text-xl tracking-tight">{title}</h2>
+    </div>
+    {subtitle && <span className="text-xs text-muted-foreground hidden md:block">{subtitle}</span>}
+  </div>
+);
+
 const Th = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
   <th className={`px-3 py-3 text-left font-medium ${className}`}>{children}</th>
 );
