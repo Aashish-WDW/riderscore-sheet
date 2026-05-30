@@ -508,6 +508,7 @@ export default function ScoringPage() {
                             value={corrections[m.no] || ""}
                             onChange={(v) => handleCorrection(m.no, v)}
                             placeholder="—"
+                            bordered
                             data-grid="1"
                             data-row={i}
                             data-col={1}
@@ -522,6 +523,7 @@ export default function ScoringPage() {
                               setCoefficients((c) => ({ ...c, [m.no]: v }));
                             }}
                             placeholder="—"
+                            bordered
                             min={1}
                             step={1}
                           />
@@ -540,7 +542,7 @@ export default function ScoringPage() {
                         </td>
                         <td className="px-1 py-2">
                           <input
-                            className="w-full bg-transparent rounded-md px-2 py-1.5 text-xs outline-none focus:bg-background focus:ring-1 focus:ring-ring transition-all"
+                            className="w-full bg-transparent border border-border rounded-md px-2 py-1.5 text-xs outline-none focus:bg-background focus:ring-1 focus:ring-ring transition-all"
                             value={remarks[m.no] || ""}
                             onChange={(e) => setRemarks((r) => ({ ...r, [m.no]: e.target.value }))}
                           />
@@ -610,6 +612,7 @@ export default function ScoringPage() {
                         value={corrections[m.no] || ""}
                         onChange={(v) => handleCorrection(m.no, v)}
                         placeholder="—"
+                        bordered
                       />
                     </label>
                     <label className="block">
@@ -621,6 +624,7 @@ export default function ScoringPage() {
                           setCoefficients((c) => ({ ...c, [m.no]: v }));
                         }}
                         placeholder={String(m.coefficient)}
+                        bordered
                         min={1}
                         step={1}
                       />
@@ -699,6 +703,7 @@ export default function ScoringPage() {
                               value={artisticCorrections[m.no] || ""}
                               onChange={(v) => { if (v !== "" && (parseFloat(v) < 0 || parseFloat(v) > 10)) return; setArtisticCorrections((s) => ({ ...s, [m.no]: v })); }}
                               placeholder="—"
+                              bordered
                             />
                           </td>
                           <td className="px-3 py-3 text-center text-muted-foreground text-xs">×{m.coefficient}</td>
@@ -749,7 +754,7 @@ export default function ScoringPage() {
                       </label>
                       <label className="block">
                         <span className="block text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Corr.</span>
-                        <NumInput value={artisticCorrections[m.no] || ""} onChange={(v) => { if (v !== "" && (parseFloat(v) < 0 || parseFloat(v) > 10)) return; setArtisticCorrections((s) => ({ ...s, [m.no]: v })); }} placeholder="—" />
+                        <NumInput value={artisticCorrections[m.no] || ""} onChange={(v) => { if (v !== "" && (parseFloat(v) < 0 || parseFloat(v) > 10)) return; setArtisticCorrections((s) => ({ ...s, [m.no]: v })); }} placeholder="—" bordered />
                       </label>
                     </div>
                   </div>
@@ -808,6 +813,7 @@ export default function ScoringPage() {
                               value={rawCorr}
                               onChange={(v) => setCollectiveCorrections((s) => ({ ...s, [c.no]: v }))}
                               placeholder="Corr."
+                              bordered
                             />
                           </td>
                           <td className="px-3 py-4 w-16 text-center text-muted-foreground text-xs">×{c.coefficient}</td>
@@ -816,7 +822,7 @@ export default function ScoringPage() {
                           </td>
                           <td className="px-1 py-2 w-44">
                             <input
-                              className="w-full bg-transparent rounded-md px-2 py-1.5 text-xs outline-none focus:bg-background focus:ring-1 focus:ring-ring transition-all"
+                              className="w-full bg-transparent border border-border rounded-md px-2 py-1.5 text-xs outline-none focus:bg-background focus:ring-1 focus:ring-ring transition-all"
                               placeholder="Remarks"
                               value={collectiveRemarksMap[c.no] ?? ""}
                               onChange={(e) => setCollectiveRemarksMap((r) => ({ ...r, [c.no]: e.target.value }))}
@@ -1249,6 +1255,7 @@ type NumInputProps = {
   onChange: (v: string) => void;
   placeholder?: string;
   accent?: boolean;
+  bordered?: boolean;
   min?: number;
   step?: number;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "min" | "step" | "placeholder">;
@@ -1258,6 +1265,7 @@ const NumInput = ({
   onChange,
   placeholder,
   accent = false,
+  bordered = false,
   min = 0,
   step = 0.5,
   className,
@@ -1275,6 +1283,8 @@ const NumInput = ({
     className={`w-full text-center tabular-nums rounded-md py-1.5 text-sm outline-none transition-all bg-transparent border ${
       accent
         ? "border-border focus:border-highlight focus:bg-background focus:ring-2 focus:ring-highlight/20"
+        : bordered
+        ? "border-border focus:border-ring focus:bg-background"
         : "border-transparent hover:border-border focus:border-ring focus:bg-background"
     } ${className ?? ""}`}
     {...rest}
