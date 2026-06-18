@@ -44,7 +44,7 @@ function EventCard({ ev }: { ev: ShowEvent }) {
                     <div className="text-sm font-medium">{cls.name}</div>
                     <div className="text-xs text-muted-foreground mt-0.5">{cls.startTime} · {TEST_NAMES[cls.testId] ?? cls.testId} · {entries.length} riders</div>
                   </div>
-                  <Link href={`/scoring/${cls.testId}`} target="_blank" className="shrink-0 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted transition-colors">
+                  <Link href={cls.type === "showjumping" ? `/scoring/sj/${cls.testId}` : `/scoring/${cls.testId}`} target="_blank" className="shrink-0 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted transition-colors">
                     Open Sheet <ExternalLink className="h-3 w-3" />
                   </Link>
                 </div>

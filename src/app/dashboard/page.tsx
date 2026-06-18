@@ -37,6 +37,7 @@ export default function HubPage() {
   const { user } = useAuth();
 
   const [tab, setTab] = useState<Tab>("overview");
+  const [sheetKind, setSheetKind] = useState<"dressage" | "showjumping">("dressage");
   const [riderSearch, setRiderSearch] = useState("");
   const [sessionFilter, setSessionFilter] = useState<"all" | ScoringSession["status"]>("all");
   const [allRiders, setAllRiders] = useState<Rider[]>(DUMMY_RIDERS);
@@ -249,12 +250,24 @@ export default function HubPage() {
       {/* SCORING SHEETS */}
       {tab === "sheets" && (
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">Open any scoring sheet to start scoring. Scores auto-save as you go.</p>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-sm text-muted-foreground">Open any scoring sheet to start scoring. Scores auto-save as you go.</p>
+            <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+              {(["dressage", "showjumping"] as const).map((k) => (
+                <button key={k} onClick={() => setSheetKind(k)}
+                  className={`text-xs px-3 py-1.5 rounded-md transition-colors capitalize ${sheetKind === k ? "bg-card shadow-soft text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  {k === "dressage" ? "Dressage" : "Show Jumping"}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {TEST_CARDS.map((t) => {
+            {TEST_CARDS.filter((t) => (t.kind ?? "dressage") === sheetKind).map((t) => {
               const riderCount = activeEvent
                 ? activeEvent.classes.filter((c) => c.testId === t.slug).reduce((n, c) => n + (DUMMY_ENTRIES[c.id]?.length ?? 0), 0)
                 : 0;
+              const href = t.kind === "showjumping" ? `/scoring/sj/${t.slug}` : `/scoring/${t.slug}`;
               return (
                 <div key={t.slug} className="bg-card border border-border rounded-xl p-5 shadow-soft flex flex-col gap-3 hover:border-foreground/20 transition-colors">
                   <div>
@@ -264,10 +277,10 @@ export default function HubPage() {
                   </div>
                   <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
                     <div className="text-xs text-muted-foreground">
-                      Max <span className="font-mono">{t.maxScore}</span> pts
+                      {t.kind === "showjumping" ? "Fault & time based" : <>Max <span className="font-mono">{t.maxScore}</span> pts</>}
                       {riderCount > 0 && <> · <span className="text-foreground">{riderCount} riders today</span></>}
                     </div>
-                    <Link href={`/scoring/${t.slug}`} target="_blank"
+                    <Link href={href} target="_blank"
                       className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
                     >
                       Open <ExternalLink className="h-3 w-3" />

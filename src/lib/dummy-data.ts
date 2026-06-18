@@ -128,6 +128,7 @@ export const TEST_NAMES: Record<string, string> = {
   "epl-junior-riders":          "EPL Junior Riders",
   "epl-children-i":             "EPL Children I",
   "epl-children-ii":            "EPL Children II",
+  "jumping-phase":              "Jumping Phase (Eventing)",
 };
 
 export const DUMMY_USERS: User[] = [
@@ -168,6 +169,7 @@ export const DUMMY_EVENTS: ShowEvent[] = [
       { id: "c10", name: "Children I Dressage",      testId: "children-i",   type: "dressage", judgeId: "u2", writerId: "u4", startTime: "11:30" },
       { id: "c11", name: "Children II Dressage",     testId: "children-ii",  type: "dressage", judgeId: "u2", writerId: "u4", startTime: "14:30" },
       { id: "c12", name: "Follow the Leader",        testId: "follow-the-leader", type: "dressage", judgeId: "u2", writerId: "u4", startTime: "16:00" },
+      { id: "c13", name: "Novice Jumping Phase",     testId: "jumping-phase", type: "showjumping", judgeId: "u3", writerId: "u5", startTime: "12:00" },
     ],
   },
   {
@@ -207,6 +209,7 @@ export const DUMMY_ENTRIES: Record<string, string[]> = {
   c7: ["r2", "r7"],
   c8: ["r1", "r2", "r3", "r4", "r5"],
   c9: ["r2", "r4", "r6", "r8"],
+  c13: ["r1", "r2", "r3", "r4", "r5", "r6"],
 };
 
 export type TestCard = {
@@ -215,6 +218,7 @@ export type TestCard = {
   appendix: string;
   description: string;
   maxScore: number;
+  kind?: "dressage" | "showjumping";
 };
 
 export const TEST_CARDS: TestCard[] = [
@@ -261,6 +265,7 @@ export const TEST_CARDS: TestCard[] = [
   { slug: "epl-junior-riders",   category: "EPL Junior Riders",          appendix: "Appendix 'F'",          description: "Time: 4.45 min · EPL test · Min age: 4 years", maxScore: 230 },
   { slug: "epl-children-i",      category: "EPL Children I",             appendix: "Appendix 'G'",          description: "Time: 4 min · EPL test · Min age: 4 years", maxScore: 170 },
   { slug: "epl-children-ii",     category: "EPL Children II",            appendix: "Appendix 'H'",          description: "Snaffle bridle · Rising trot optional · Min age: 4 years", maxScore: 160 },
+  { slug: "jumping-phase", category: "Jumping Phase", appendix: "Eventing", description: "Pony Club · Jumping Phase Score Sheet · Fault & time based", maxScore: 0, kind: "showjumping" },
 ];
 
 export const DUMMY_SESSIONS: ScoringSession[] = [

@@ -96,7 +96,7 @@ export default function RiderDashboard() {
                   <span className={`text-[10px] uppercase tracking-wider font-medium px-2 py-0.5 rounded-full ${event.status === "active" ? "bg-highlight/20 text-highlight" : "bg-muted text-muted-foreground"}`}>
                     {event.status}
                   </span>
-                  <Link href={`/scoring/${classObj.testId}`} target="_blank"
+                  <Link href={classObj.type === "showjumping" ? `/scoring/sj/${classObj.testId}` : `/scoring/${classObj.testId}`} target="_blank"
                     className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted transition-colors"
                   >
                     Test <ExternalLink className="h-3 w-3" />
